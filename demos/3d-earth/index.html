@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbital Datacenter — Dawn Terminator</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+canvas { display: block; }
+
+#hud {
+  position: fixed; top: 20px; left: 20px; z-index: 10;
+  color: #0ff; pointer-events: none;
+}
+#hud h1 {
+  font-size: 14px; letter-spacing: 4px; text-transform: uppercase;
+  margin-bottom: 8px; text-shadow: 0 0 10px #0ff;
+}
+#hud .stat {
+  font-size: 11px; opacity: 0.7; line-height: 1.8;
+}
+#hud .stat span { color: #fff; opacity: 1; }
+
+#legend {
+  position: fixed; bottom: 20px; left: 20px; z-index: 10;
+  color: #0ff; font-size: 10px; opacity: 0.5; pointer-events: none;
+}
+
+#tooltip {
+  position: fixed; z-index: 20; background: rgba(0,20,30,0.9);
+  border: 1px solid #0ff; border-radius: 4px; padding: 8px 12px;
+  color: #fff; font-size: 11px; pointer-events: none; display: none;
+  box-shadow: 0 0 15px rgba(0,255,255,0.2);
+}
+
+#controls {
+  position: fixed; bottom: 20px; right: 20px; z-index: 10;
+  display: flex; gap: 8px;
+}
+#controls button {
+  background: rgba(0,255,255,0.08); border: 1px solid rgba(0,255,255,0.3);
+  color: #0ff; padding: 6px 14px; font-size: 11px; cursor: pointer;
+  font-family: 'Courier New', monospace; letter-spacing: 1px;
+  transition: all 0.2s;
+}
+#controls button:hover { background: rgba(0,255,255,0.2); border-color: #0ff; }
+#controls button.active { background: rgba(0,255,255,0.25); border-color: #0ff; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <h1>Orbital Datacenter</h1>
+  <div class="stat">Active Satellites: <span id="sat-count">0</span></div>
+  <div class="stat">Data Streams: <span id="stream-count">0</span></div>
+  <div class="stat">Uplink Bandwidth: <span id="bw">0</span> Gbps</div>
+  <div class="stat">Orbital Altitude: <span id="alt">420</span> km LEO</div>
+  <div class="stat">Terminator Phase: <span id="phase">Dawn</span></div>
+  <div class="stat">System Time: <span id="clock">--:--:--</span></div>
+</div>
+
+<div id="legend">DRAG TO ORBIT &nbsp;|&nbsp; SCROLL TO ZOOM &nbsp;|&nbsp; CLICK SATELLITES FOR INFO</div>
+
+<div id="tooltip"></div>
+
+<div id="controls">
+  <button id="btn-rotate" class="active" onclick="toggleAutoRotate()">AUTO-ROTATE</button>
+  <button id="btn-streams" class="active" onclick="toggleStreams()">DATA STREAMS</button>
+  <button id="btn-labels" onclick="toggleLabels()">LABELS</button>
+  <button id="btn-reset" onclick="resetCamera()">RESET VIEW</button>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ── Scene Setup ──
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
+camera.position.set(4, 3, 6);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance = 3;
+controls.maxDistance = 30;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.3;
+
+// ── Stars ──
+const starGeo = new THREE.BufferGeometry();
+const starCount = 8000;
+const starPos = new Float32Array(starCount * 3);
+const starSizes = new Float32Array(starCount);
+for (let i = 0; i < starCount; i++) {
+  const r = 400 + Math.random() * 600;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(2 * Math.random() - 1);
+  starPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+  starPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+  starPos[i*3+2] = r * Math.cos(phi);
+  starSizes[i] = 0.5 + Math.random() * 1.5;
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+starGeo.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
+
+const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, sizeAttenuation: true });
+scene.add(new THREE.Points(starGeo, starMat));
+
+// ── Procedural Earth Texture ──
+function createEarthTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048; canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+
+  // Ocean gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
+  grad.addColorStop(0, '#1a3a5c');
+  grad.addColorStop(0.3, '#0d4a7a');
+  grad.addColorStop(0.5, '#0a5e91');
+  grad.addColorStop(0.7, '#0d4a7a');
+  grad.addColorStop(1, '#1a3a5c');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 2048, 1024);
+
+  // Procedural continents using noise-like approach
+  const continents = [
+    // North America
+    { x: 400, y: 280, w: 250, h: 200, color: '#2d6b30' },
+    { x: 350, y: 200, w: 180, h: 100, color: '#3a7a3a' },
+    // South America
+    { x: 550, y: 520, w: 120, h: 250, color: '#1d7a2d' },
+    // Europe
+    { x: 1000, y: 230, w: 150, h: 120, color: '#3a7a3a' },
+    // Africa
+    { x: 1050, y: 400, w: 180, h: 280, color: '#5a8a30' },
+    // Asia
+    { x: 1200, y: 200, w: 400, h: 250, color: '#3a7a3a' },
+    // India
+    { x: 1350, y: 420, w: 80, h: 120, color: '#4a8a30' },
+    // Australia
+    { x: 1550, y: 560, w: 180, h: 120, color: '#8a7a30' },
+    // Antarctica
+    { x: 1024, y: 920, w: 800, h: 100, color: '#d0d8e0' },
+    // Greenland
+    { x: 600, y: 150, w: 100, h: 80, color: '#c0d0d8' },
+  ];
+
+  continents.forEach(c => {
+    ctx.fillStyle = c.color;
+    ctx.beginPath();
+    // Draw rough continent shape with some randomness
+    for (let i = 0; i < 40; i++) {
+      const angle = (i / 40) * Math.PI * 2;
+      const rx = c.w / 2 * (0.7 + 0.3 * Math.sin(angle * 3 + c.x));
+      const ry = c.h / 2 * (0.7 + 0.3 * Math.cos(angle * 2 + c.y));
+      const px = c.x + Math.cos(angle) * rx;
+      const py = c.y + Math.sin(angle) * ry;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+  });
+
+  // City lights (night side will use this)
+  ctx.fillStyle = '#ffcc44';
+  const cities = [
+    [420, 300], [380, 310], [450, 290], // US East Coast
+    [350, 310], [340, 300], // US West Coast
+    [1000, 260], [1020, 250], [1050, 270], // Europe
+    [1300, 300], [1350, 320], [1400, 280], // China/Japan
+    [1350, 430], // India
+    [560, 540], // Brazil
+    [1560, 580], // Australia
+  ];
+  cities.forEach(([cx, cy]) => {
+    for (let i = 0; i < 30; i++) {
+      const x = cx + (Math.random() - 0.5) * 60;
+      const y = cy + (Math.random() - 0.5) * 40;
+      const r = 1 + Math.random() * 3;
+      ctx.globalAlpha = 0.3 + Math.random() * 0.7;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+  ctx.globalAlpha = 1;
+
+  return new THREE.CanvasTexture(canvas);
+}
+
+// ── Earth ──
+const EARTH_RADIUS = 1.5;
+const earthTex = createEarthTexture();
+const earthGeo = new THREE.SphereGeometry(EARTH_RADIUS, 128, 64);
+const earthMat = new THREE.MeshStandardMaterial({
+  map: earthTex,
+  roughness: 0.8,
+  metalness: 0.1,
+});
+const earth = new THREE.Mesh(earthGeo, earthMat);
+scene.add(earth);
+
+// ── Atmosphere Glow ──
+const atmosGeo = new THREE.SphereGeometry(EARTH_RADIUS * 1.04, 64, 32);
+const atmosMat = new THREE.ShaderMaterial({
+  vertexShader: `
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+    void main() {
+      vNormal = normalize(normalMatrix * normal);
+      vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+    void main() {
+      float intensity = pow(0.72 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.5);
+      vec3 color = mix(vec3(0.1, 0.4, 1.0), vec3(0.8, 0.4, 0.1), intensity * 0.5);
+      gl_FragColor = vec4(color, intensity * 0.6);
+    }
+  `,
+  blending: THREE.AdditiveBlending,
+  side: THREE.BackSide,
+  transparent: true,
+  depthWrite: false,
+});
+scene.add(new THREE.Mesh(atmosGeo, atmosMat));
+
+// ── Dawn Terminator Shader ──
+// The sun is coming from the left. The terminator is the day/night boundary.
+const terminatorGeo = new THREE.SphereGeometry(EARTH_RADIUS * 1.005, 128, 64);
+const terminatorMat = new THREE.ShaderMaterial({
+  uniforms: {
+    sunDirection: { value: new THREE.Vector3(-1, 0.2, 0.5).normalize() },
+    dawnColor: { value: new THREE.Color(1.0, 0.55, 0.15) },
+    nightColor: { value: new THREE.Color(0.0, 0.0, 0.02) },
+  },
+  vertexShader: `
+    varying vec3 vWorldNormal;
+    varying vec3 vWorldPosition;
+    void main() {
+      vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+      vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 sunDirection;
+    uniform vec3 dawnColor;
+    uniform vec3 nightColor;
+    varying vec3 vWorldNormal;
+    varying vec3 vWorldPosition;
+
+    void main() {
+      float NdotL = dot(vWorldNormal, sunDirection);
+
+      // Dawn terminator band: narrow transition zone
+      float terminator = smoothstep(-0.08, 0.02, NdotL);
+
+      // Dawn glow band (narrow)
+      float dawnGlow = exp(-pow((NdotL + 0.01) / 0.04, 2.0));
+      dawnGlow *= 0.8;
+
+      // Night side gets slightly colored
+      vec3 night = mix(nightColor, dawnColor * 0.15, smoothstep(-0.3, -0.05, NdotL));
+
+      // Dawn band
+      vec3 day = dawnColor * dawnGlow;
+
+      // Combine
+      vec3 color = mix(night, day, terminator);
+
+      // Fade out the day side (let the earth texture show through)
+      float dayAlpha = dawnGlow * 0.9;
+      float nightAlpha = smoothstep(-0.1, -0.4, NdotL) * 0.3;
+
+      float alpha = dayAlpha + nightAlpha;
+      gl_FragColor = vec4(color, alpha);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  side: THREE.FrontSide,
+});
+const terminatorMesh = new THREE.Mesh(terminatorGeo, terminatorMat);
+scene.add(terminatorMesh);
+
+// ── Sun Light ──
+const sunLight = new THREE.DirectionalLight(0xffeedd, 3);
+sunLight.position.set(-5, 1, 2);
+scene.add(sunLight);
+
+const ambientLight = new THREE.AmbientLight(0x111122, 0.5);
+scene.add(ambientLight);
+
+// ── Satellite Data ──
+const satelliteNames = [
+  'DC-ALPHA', 'DC-BETA', 'DC-GAMMA', 'DC-DELTA', 'DC-EPSILON',
+  'DC-ZETA', 'DC-ETA', 'DC-THETA', 'DC-IOTA', 'DC-KAPPA',
+  'DC-LAMBDA', 'DC-MU', 'DC-NU', 'DC-XI', 'DC-OMICRON',
+  'DC-PI', 'DC-RHO', 'DC-SIGMA', 'DC-TAU', 'DC-UPSILON',
+];
+
+const satellites = [];
+const orbitLines = [];
+const dataStreams = [];
+const labelSprites = [];
+
+function createSatelliteMaterial(color) {
+  return new THREE.MeshStandardMaterial({
+    color, emissive: color, emissiveIntensity: 0.8,
+    roughness: 0.3, metalness: 0.9,
+  });
+}
+
+// Create satellite constellations
+const orbits = [
+  { inclination: 45, altitude: 0.8, count: 6, speed: 0.4, color: 0x00ffff },
+  { inclination: -30, altitude: 1.2, count: 5, speed: 0.3, color: 0x00ff88 },
+  { inclination: 60, altitude: 1.6, count: 4, speed: 0.25, color: 0xff8800 },
+  { inclination: -55, altitude: 2.0, count: 3, speed: 0.2, color: 0xff00ff },
+  { inclination: 10, altitude: 2.5, count: 2, speed: 0.15, color: 0xffff00 },
+];
+
+let satIndex = 0;
+orbits.forEach((orbit, oi) => {
+  const orbitGroup = new THREE.Group();
+
+  // Orbit ring
+  const orbitGeo = new THREE.TorusGeometry(EARTH_RADIUS + orbit.altitude, 0.003, 8, 128);
+  const orbitMat = new THREE.MeshBasicMaterial({
+    color: orbit.color, transparent: true, opacity: 0.15,
+  });
+  const orbitRing = new THREE.Mesh(orbitGeo, orbitMat);
+  orbitRing.rotation.x = Math.PI / 2;
+  orbitGroup.add(orbitRing);
+
+  orbitGroup.rotation.x = THREE.MathUtils.degToRad(orbit.inclination);
+  scene.add(orbitGroup);
+
+  for (let i = 0; i < orbit.count; i++) {
+    const angle = (i / orbit.count) * Math.PI * 2;
+    const r = EARTH_RADIUS + orbit.altitude;
+
+    // Satellite body
+    const bodyGeo = new THREE.BoxGeometry(0.06, 0.06, 0.1);
+    const satMat = createSatelliteMaterial(orbit.color);
+    const body = new THREE.Mesh(bodyGeo, satMat);
+
+    // Solar panels
+    const panelGeo = new THREE.BoxGeometry(0.2, 0.01, 0.08);
+    const panelMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1a4a, emissive: orbit.color, emissiveIntensity: 0.1,
+      roughness: 0.2, metalness: 0.95,
+    });
+    const panel1 = new THREE.Mesh(panelGeo, panelMat);
+    panel1.position.x = 0.13;
+    body.add(panel1);
+    const panel2 = new THREE.Mesh(panelGeo, panelMat);
+    panel2.position.x = -0.13;
+    body.add(panel2);
+
+    // Glow point
+    const glowGeo = new THREE.SphereGeometry(0.04, 16, 8);
+    const glowMat = new THREE.MeshBasicMaterial({
+      color: orbit.color, transparent: true, opacity: 0.6,
+    });
+    const glow = new THREE.Mesh(glowGeo, glowMat);
+    body.add(glow);
+
+    body.userData = {
+      name: satelliteNames[satIndex] || `SAT-${satIndex}`,
+      orbit: oi,
+      inclination: orbit.inclination,
+      altitude: orbit.altitude,
+      speed: orbit.speed,
+      angle: angle,
+      color: orbit.color,
+    };
+
+    orbitGroup.add(body);
+    satellites.push(body);
+    satIndex++;
+  }
+
+  orbitLines.push(orbitRing);
+});
+
+// ── Data Streams (connecting satellites to Earth and each other) ──
+function createDataStream(startPos, endPos, color) {
+  const points = [];
+  const segments = 40;
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const pos = new THREE.Vector3().lerpVectors(startPos, endPos, t);
+    // Add a curve
+    const mid = startPos.clone().add(endPos).multiplyScalar(0.5);
+    const dist = startPos.distanceTo(endPos);
+    const curveAmount = dist * 0.15 * Math.sin(t * Math.PI);
+    pos.add(mid.clone().normalize().multiplyScalar(curveAmount));
+    points.push(pos);
+  }
+
+  const geo = new THREE.BufferGeometry().setFromPoints(points);
+  const mat = new THREE.LineBasicMaterial({
+    color, transparent: true, opacity: 0.4,
+    blending: THREE.AdditiveBlending,
+  });
+  const line = new THREE.Line(geo, mat);
+  scene.add(line);
+
+  // Animated particle along stream
+  const particleGeo = new THREE.SphereGeometry(0.015, 8, 4);
+  const particleMat = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.9,
+    blending: THREE.AdditiveBlending,
+  });
+  const particle = new THREE.Mesh(particleGeo, particleMat);
+  scene.add(particle);
+
+  return { line, particle, color, progress: Math.random(), speed: 0.3 + Math.random() * 0.5, startPos, endPos };
+}
+
+// Create inter-satellite links
+for (let i = 0; i < satellites.length; i++) {
+  const next = (i + 1) % satellites.length;
+  if (satellites[i].userData.orbit === satellites[next].userData.orbit) {
+    const p1 = new THREE.Vector3();
+    const p2 = new THREE.Vector3();
+    satellites[i].getWorldPosition(p1);
+    satellites[next].getWorldPosition(p2);
+    const color = satellites[i].userData.color;
+    dataStreams.push(createDataStream(p1, p2, color));
+  }
+}
+
+// Create satellite-to-Earth links (ground stations)
+const groundStations = [
+  { lat: 37.77, lon: -122.42, name: 'San Francisco' },
+  { lat: 51.51, lon: -0.13, name: 'London' },
+  { lat: 35.68, lon: 139.69, name: 'Tokyo' },
+  { lat: -33.87, lon: 151.21, name: 'Sydney' },
+  { lat: 1.35, lon: 103.82, name: 'Singapore' },
+];
+
+groundStations.forEach(gs => {
+  const latRad = THREE.MathUtils.degToRad(gs.lat);
+  const lonRad = THREE.MathUtils.degToRad(gs.lon);
+  const r = EARTH_RADIUS * 0.99;
+  const gsPos = new THREE.Vector3(
+    r * Math.cos(latRad) * Math.cos(lonRad),
+    r * Math.sin(latRad),
+    r * Math.cos(latRad) * Math.sin(lonRad)
+  );
+
+  // Ground station light
+  const gsGeo = new THREE.SphereGeometry(0.03, 8, 4);
+  const gsMat = new THREE.MeshBasicMaterial({
+    color: 0x00ffaa, transparent: true, opacity: 0.8,
+  });
+  const gsMesh = new THREE.Mesh(gsGeo, gsMat);
+  gsMesh.position.copy(gsPos);
+  earth.add(gsMesh);
+
+  // Connect to nearest satellite
+  let nearest = null, minDist = Infinity;
+  satellites.forEach(sat => {
+    const p = new THREE.Vector3();
+    sat.getWorldPosition(p);
+    const d = p.distanceTo(gsPos);
+    if (d < minDist) { minDist = d; nearest = sat; }
+  });
+
+  if (nearest) {
+    const satPos = new THREE.Vector3();
+    nearest.getWorldPosition(satPos);
+    dataStreams.push(createDataStream(gsPos.clone().applyMatrix4(earth.matrixWorld), satPos, 0x00ffaa));
+  }
+});
+
+// ── Labels ──
+function createLabel(text, color) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.font = 'bold 28px Courier New';
+  ctx.fillStyle = '#' + new THREE.Color(color).getHexString();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 128, 32);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.SpriteMaterial({
+    map: tex, transparent: true, opacity: 0,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(0.6, 0.15, 1);
+  return sprite;
+}
+
+satellites.forEach(sat => {
+  const label = createLabel(sat.userData.name, sat.userData.color);
+  sat.add(label);
+  label.position.y = 0.15;
+  labelSprites.push(label);
+});
+
+// ── Dawn Glow Ring ──
+const dawnRingGeo = new THREE.RingGeometry(EARTH_RADIUS * 1.01, EARTH_RADIUS * 1.08, 128);
+const dawnRingMat = new THREE.ShaderMaterial({
+  uniforms: {
+    sunDir: { value: new THREE.Vector3(-1, 0.2, 0.5).normalize() },
+  },
+  vertexShader: `
+    varying vec3 vWorldNormal;
+    void main() {
+      vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 sunDir;
+    varying vec3 vWorldNormal;
+    void main() {
+      float NdotL = dot(vWorldNormal, sunDir);
+      float band = exp(-pow(NdotL / 0.06, 2.0));
+      vec3 color = mix(vec3(1.0, 0.3, 0.1), vec3(1.0, 0.8, 0.3), band);
+      gl_FragColor = vec4(color, band * 0.5);
+    }
+  `,
+  transparent: true, depthWrite: false,
+  blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+});
+const dawnRing = new THREE.Mesh(dawnRingGeo, dawnRingMat);
+dawnRing.lookAt(-5, 1, 2);
+scene.add(dawnRing);
+
+// ── Floating Data Particles ──
+const particleCount = 500;
+const dataParticleGeo = new THREE.BufferGeometry();
+const dpPositions = new Float32Array(particleCount * 3);
+const dpColors = new Float32Array(particleCount * 3);
+const dpSizes = new Float32Array(particleCount);
+const dpData = [];
+
+for (let i = 0; i < particleCount; i++) {
+  const orbitIdx = Math.floor(Math.random() * orbits.length);
+  const orbit = orbits[orbitIdx];
+  const r = EARTH_RADIUS + orbit.altitude + (Math.random() - 0.5) * 0.3;
+  const angle = Math.random() * Math.PI * 2;
+  const inc = THREE.MathUtils.degToRad(orbit.inclination);
+
+  dpPositions[i*3] = r * Math.cos(angle) * Math.cos(inc);
+  dpPositions[i*3+1] = r * Math.sin(angle) * Math.sin(inc) + (Math.random() - 0.5) * 0.2;
+  dpPositions[i*3+2] = r * Math.sin(angle) * Math.cos(inc);
+
+  const c = new THREE.Color(orbit.color);
+  dpColors[i*3] = c.r;
+  dpColors[i*3+1] = c.g;
+  dpColors[i*3+2] = c.b;
+  dpSizes[i] = 1 + Math.random() * 2;
+
+  dpData.push({ orbit: orbitIdx, angle, speed: 0.2 + Math.random() * 0.5, r });
+}
+
+dataParticleGeo.setAttribute('position', new THREE.BufferAttribute(dpPositions, 3));
+dataParticleGeo.setAttribute('color', new THREE.BufferAttribute(dpColors, 3));
+dataParticleGeo.setAttribute('size', new THREE.BufferAttribute(dpSizes, 1));
+
+const dataParticleMat = new THREE.PointsMaterial({
+  size: 0.03, vertexColors: true, transparent: true, opacity: 0.6,
+  blending: THREE.AdditiveBlending, depthWrite: false,
+});
+const dataParticles = new THREE.Points(dataParticleGeo, dataParticleMat);
+scene.add(dataParticles);
+
+// ── Raycaster for hover ──
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const tooltip = document.getElementById('tooltip');
+
+renderer.domElement.addEventListener('mousemove', (e) => {
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(satellites);
+
+  if (intersects.length > 0) {
+    const sat = intersects[0].object;
+    const d = sat.userData;
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.clientX + 15) + 'px';
+    tooltip.style.top = (e.clientY - 10) + 'px';
+    tooltip.innerHTML = `
+      <strong style="color:#0ff">${d.name}</strong><br>
+      Orbit: ${d.orbit} | Altitude: ${(d.altitude * 6371).toFixed(0)} km<br>
+      Speed: ${d.speed.toFixed(2)} rad/s<br>
+      Link: ${d.color.toString(16)}
+    `;
+    document.body.style.cursor = 'pointer';
+  } else {
+    tooltip.style.display = 'none';
+    document.body.style.cursor = 'default';
+  }
+});
+
+// ── Toggle Functions ──
+window.toggleAutoRotate = () => {
+  controls.autoRotate = !controls.autoRotate;
+  document.getElementById('btn-rotate').classList.toggle('active');
+};
+
+window.toggleStreams = () => {
+  const show = !dataStreams[0].line.visible;
+  dataStreams.forEach(s => { s.line.visible = show; s.particle.visible = show; });
+  document.getElementById('btn-streams').classList.toggle('active');
+};
+
+let labelsVisible = false;
+window.toggleLabels = () => {
+  labelsVisible = !labelsVisible;
+  labelSprites.forEach(l => l.material.opacity = labelsVisible ? 0.8 : 0);
+  document.getElementById('btn-labels').classList.toggle('active');
+};
+
+window.resetCamera = () => {
+  camera.position.set(4, 3, 6);
+  controls.target.set(0, 0, 0);
+  controls.update();
+};
+
+// ── Animation Loop ──
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  const elapsed = clock.getElapsedTime();
+
+  // Update satellites
+  satellites.forEach(sat => {
+    const d = sat.userData;
+    d.angle += d.speed * dt;
+    const r = EARTH_RADIUS + d.altitude;
+    const incRad = THREE.MathUtils.degToRad(d.inclination);
+
+    sat.position.x = r * Math.cos(d.angle);
+    sat.position.y = r * Math.sin(d.angle) * Math.sin(incRad);
+    sat.position.z = r * Math.sin(d.angle) * Math.cos(incRad);
+
+    // Rotate body
+    sat.rotation.y += dt * 2;
+  });
+
+  // Update data streams (reconnect to moving satellites)
+  let streamIdx = 0;
+  for (let i = 0; i < satellites.length; i++) {
+    const next = (i + 1) % satellites.length;
+    if (satellites[i].userData.orbit === satellites[next].userData.orbit) {
+      if (streamIdx < dataStreams.length) {
+        const s = dataStreams[streamIdx];
+        const p1 = new THREE.Vector3();
+        const p2 = new THREE.Vector3();
+        satellites[i].getWorldPosition(p1);
+        satellites[next].getWorldPosition(p2);
+
+        const points = [];
+        const segments = 40;
+        for (let j = 0; j <= segments; j++) {
+          const t = j / segments;
+          const pos = new THREE.Vector3().lerpVectors(p1, p2, t);
+          const mid = p1.clone().add(p2).multiplyScalar(0.5);
+          const dist = p1.distanceTo(p2);
+          pos.add(mid.clone().normalize().multiplyScalar(dist * 0.15 * Math.sin(t * Math.PI)));
+          points.push(pos);
+        }
+        s.line.geometry.dispose();
+        s.line.geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+        // Animate particle
+        s.progress += s.speed * dt;
+        if (s.progress > 1) s.progress -= 1;
+        const ptIdx = Math.floor(s.progress * 40);
+        if (ptIdx < points.length) {
+          s.particle.position.copy(points[ptIdx]);
+        }
+      }
+      streamIdx++;
+    }
+  }
+
+  // Update data particles
+  const positions = dataParticles.geometry.attributes.position.array;
+  for (let i = 0; i < particleCount; i++) {
+    const d = dpData[i];
+    d.angle += d.speed * dt;
+    const incRad = THREE.MathUtils.degToRad(orbits[d.orbit].inclination);
+    positions[i*3] = d.r * Math.cos(d.angle) * Math.cos(incRad);
+    positions[i*3+1] = d.r * Math.sin(d.angle) * Math.sin(incRad) + Math.sin(elapsed + i) * 0.05;
+    positions[i*3+2] = d.r * Math.sin(d.angle) * Math.cos(incRad);
+  }
+  dataParticles.geometry.attributes.position.needsUpdate = true;
+
+  // Slow Earth rotation
+  earth.rotation.y += dt * 0.02;
+
+  // Update HUD
+  document.getElementById('sat-count').textContent = satellites.length;
+  document.getElementById('stream-count').textContent = dataStreams.length;
+  document.getElementById('bw').textContent = (satellites.length * 12.4 + Math.sin(elapsed) * 5).toFixed(1);
+  document.getElementById('phase').textContent = 'Dawn';
+  document.getElementById('clock').textContent = new Date().toISOString().substr(11, 8);
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// ── Resize ──
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
