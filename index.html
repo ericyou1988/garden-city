@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garden City — AI Agent Demo Hub</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .header {
+      width: 100%;
+      padding: 48px 24px 32px;
+      text-align: center;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #34d399, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .header p { color: #94a3b8; font-size: 1.1rem; }
+    .container {
+      max-width: 960px;
+      width: 100%;
+      padding: 32px 24px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .demo-card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      border: 1px solid #334155;
+    }
+    .demo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      border-color: #34d399;
+    }
+    .demo-card .icon { font-size: 2rem; margin-bottom: 12px; }
+    .demo-card h3 { font-size: 1.2rem; margin-bottom: 8px; color: #f1f5f9; }
+    .demo-card p { font-size: 0.9rem; color: #94a3b8; line-height: 1.5; }
+    .demo-card .tag {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 10px;
+      background: #334155;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .empty {
+      text-align: center;
+      padding: 80px 24px;
+      color: #64748b;
+    }
+    .empty .icon { font-size: 4rem; margin-bottom: 16px; }
+    .footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: #475569;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🌿 Garden City</h1>
+    <p>AI Agent 编程项目 Demo 展示中心</p>
+  </div>
+  <div class="container">
+    <div class="empty">
+      <div class="icon">🏗️</div>
+      <h2>Garden City 已建成</h2>
+      <p>等待第一批种子入驻...</p>
+      <p style="margin-top: 12px; font-size: 0.85rem;">后续 AI Agent 制作的编程项目 Demo 将陆续部署到此站</p>
+    </div>
+  </div>
+  <div class="footer">
+    Powered by OpenClaw · 一体化部署流程 · Netlify CDN
+  </div>
+</body>
+</html>
