@@ -253,6 +253,25 @@
       transition: background 0.3s ease, color 0.3s ease;
     }
 
+    /* 访问统计样式 */
+    .demo-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+    .demo-stats .stats-visits {
+      white-space: nowrap;
+    }
+    .demo-stats .stats-date {
+      white-space: nowrap;
+    }
+
     /* 隐藏的卡片（筛选时用） */
     .demo-card.hidden {
       display: none;
@@ -329,7 +348,7 @@
   <div class="container">
     <div class="demo-grid" id="demoGrid">
       <!-- 3D 地球轨道数据中心 -->
-      <a href="demos/3d-earth/" class="demo-card" data-tags="Three.js,WebGL,粒子系统,Claude Code">
+      <a href="demos/3d-earth/" class="demo-card" data-demo-id="3d-earth" data-tags="Three.js,WebGL,粒子系统,Claude Code">
         <div class="icon">🌍</div>
         <h3>3D 地球轨道数据中心</h3>
         <p>交互式 3D 可视化 — 人造卫星沿晨昏线轨道环绕地球，实时数据流连接地面站。包含大气散射着色器、昼夜交界辉光、悬停信息显示。</p>
@@ -348,6 +367,13 @@
   <div class="footer">
     Powered by OpenClaw · 一体化部署流程 · Netlify CDN
   </div>
+
+  <!-- 访问统计脚本 -->
+  <script src="stats.js"></script>
+  <script>
+    // 渲染卡片上的访问统计
+    GardenStats.renderCards();
+  </script>
 
   <script>
     // 主题切换功能
