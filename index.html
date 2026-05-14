@@ -1,34 +1,131 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Garden City — AI Agent Demo Hub</title>
   <style>
+    /* CSS 变量 - 暗色主题（默认） */
+    :root,
+    [data-theme="dark"] {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #1e293b;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-color: #334155;
+      --accent-primary: #34d399;
+      --accent-secondary: #06b6d4;
+      --header-gradient-start: #1e293b;
+      --header-gradient-end: #0f172a;
+      --card-title: #f1f5f9;
+      --card-shadow: rgba(0,0,0,0.3);
+      --tag-bg: #334155;
+      --clear-btn-bg: #334155;
+      --clear-btn-hover: #475569;
+      --footer-color: #475569;
+      --theme-toggle-bg: #334155;
+      --theme-toggle-hover: #475569;
+    }
+
+    /* CSS 变量 - 亮色主题 */
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --accent-primary: #10b981;
+      --accent-secondary: #0891b2;
+      --header-gradient-start: #f1f5f9;
+      --header-gradient-end: #e2e8f0;
+      --card-title: #0f172a;
+      --card-shadow: rgba(0,0,0,0.1);
+      --tag-bg: #f1f5f9;
+      --clear-btn-bg: #e2e8f0;
+      --clear-btn-hover: #cbd5e1;
+      --footer-color: #94a3b8;
+      --theme-toggle-bg: #e2e8f0;
+      --theme-toggle-hover: #cbd5e1;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
     .header {
+      position: relative;
       width: 100%;
       padding: 48px 24px 32px;
       text-align: center;
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
+      transition: background 0.3s ease;
     }
     .header h1 {
       font-size: 2.5rem;
-      background: linear-gradient(135deg, #34d399, #06b6d4);
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 8px;
     }
-    .header p { color: #94a3b8; font-size: 1.1rem; }
+    .header p { color: var(--text-secondary); font-size: 1.1rem; transition: color 0.3s ease; }
+
+    /* 主题切换按钮 */
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: var(--theme-toggle-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s;
+      z-index: 10;
+    }
+    .theme-toggle:hover {
+      background: var(--theme-toggle-hover);
+      transform: scale(1.1);
+    }
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    .theme-toggle .icon-sun,
+    .theme-toggle .icon-moon {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      position: absolute;
+    }
+    .theme-toggle .icon-sun {
+      opacity: 0;
+      transform: rotate(-90deg) scale(0);
+    }
+    .theme-toggle .icon-moon {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+    [data-theme="light"] .theme-toggle .icon-sun {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+    [data-theme="light"] .theme-toggle .icon-moon {
+      opacity: 0;
+      transform: rotate(90deg) scale(0);
+    }
 
     /* 搜索和筛选区域 */
     .search-filter {
@@ -43,19 +140,19 @@
     .search-box input {
       width: 100%;
       padding: 12px 16px 12px 44px;
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       border-radius: 10px;
-      color: #e2e8f0;
+      color: var(--text-primary);
       font-size: 1rem;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.3s ease, color 0.3s ease;
     }
     .search-box input::placeholder {
-      color: #64748b;
+      color: var(--text-muted);
     }
     .search-box input:focus {
-      border-color: #34d399;
+      border-color: var(--accent-primary);
       box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
     }
     .search-box .search-icon {
@@ -63,7 +160,7 @@
       left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      color: #64748b;
+      color: var(--text-muted);
       font-size: 1.1rem;
       pointer-events: none;
     }
@@ -72,9 +169,9 @@
       right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      background: #334155;
+      background: var(--clear-btn-bg);
       border: none;
-      color: #94a3b8;
+      color: var(--text-secondary);
       font-size: 0.85rem;
       cursor: pointer;
       padding: 4px 8px;
@@ -83,7 +180,7 @@
       transition: background 0.2s;
     }
     .search-box .clear-btn:hover {
-      background: #475569;
+      background: var(--clear-btn-hover);
     }
     .search-box .clear-btn.visible {
       display: block;
@@ -97,22 +194,22 @@
     }
     .filter-tag {
       padding: 6px 14px;
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       border-radius: 20px;
-      color: #94a3b8;
+      color: var(--text-secondary);
       font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.2s;
       user-select: none;
     }
     .filter-tag:hover {
-      border-color: #34d399;
-      color: #34d399;
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
     }
     .filter-tag.active {
-      background: #34d399;
-      border-color: #34d399;
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
       color: #0f172a;
       font-weight: 600;
     }
@@ -128,31 +225,32 @@
       gap: 20px;
     }
     .demo-card {
-      background: #1e293b;
+      background: var(--bg-card);
       border-radius: 12px;
       padding: 24px;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s ease, border-color 0.3s ease;
       text-decoration: none;
       color: inherit;
       display: block;
-      border: 1px solid #334155;
+      border: 1px solid var(--border-color);
     }
     .demo-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      border-color: #34d399;
+      box-shadow: 0 8px 24px var(--card-shadow);
+      border-color: var(--accent-primary);
     }
     .demo-card .icon { font-size: 2rem; margin-bottom: 12px; }
-    .demo-card h3 { font-size: 1.2rem; margin-bottom: 8px; color: #f1f5f9; }
-    .demo-card p { font-size: 0.9rem; color: #94a3b8; line-height: 1.5; }
+    .demo-card h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--card-title); transition: color 0.3s ease; }
+    .demo-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; transition: color 0.3s ease; }
     .demo-card .tag {
       display: inline-block;
       margin-top: 12px;
       padding: 4px 10px;
-      background: #334155;
+      background: var(--tag-bg);
       border-radius: 6px;
       font-size: 0.75rem;
-      color: #94a3b8;
+      color: var(--text-secondary);
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     /* 隐藏的卡片（筛选时用） */
@@ -164,8 +262,9 @@
     .no-results {
       text-align: center;
       padding: 60px 24px;
-      color: #64748b;
+      color: var(--text-muted);
       display: none;
+      transition: color 0.3s ease;
     }
     .no-results.visible {
       display: block;
@@ -176,14 +275,15 @@
     .empty {
       text-align: center;
       padding: 80px 24px;
-      color: #64748b;
+      color: var(--text-muted);
     }
     .empty .icon { font-size: 4rem; margin-bottom: 16px; }
     .footer {
       text-align: center;
       padding: 32px 24px;
-      color: #475569;
+      color: var(--footer-color);
       font-size: 0.85rem;
+      transition: color 0.3s ease;
     }
 
     /* 移动端响应式 */
@@ -196,11 +296,16 @@
       .filter-tag { padding: 5px 12px; font-size: 0.8rem; }
       .container { padding: 12px 16px 24px; }
       .demo-grid { grid-template-columns: 1fr; }
+      .theme-toggle { top: 16px; right: 16px; width: 40px; height: 40px; font-size: 1.1rem; }
     }
   </style>
 </head>
 <body>
   <div class="header">
+    <button class="theme-toggle" id="themeToggle" title="切换主题">
+      <span class="icon-sun">☀️</span>
+      <span class="icon-moon">🌙</span>
+    </button>
     <h1>🌿 Garden City</h1>
     <p>AI Agent 编程项目 Demo 展示中心</p>
   </div>
@@ -245,6 +350,51 @@
   </div>
 
   <script>
+    // 主题切换功能
+    (function () {
+      const html = document.documentElement;
+      const themeToggle = document.getElementById('themeToggle');
+      const STORAGE_KEY = 'garden-city-theme';
+
+      // 获取初始主题：优先 localStorage，其次系统偏好
+      function getInitialTheme() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === 'light' || saved === 'dark') return saved;
+        // 检测系统偏好
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+        return 'dark';
+      }
+
+      // 应用主题
+      function applyTheme(theme) {
+        html.setAttribute('data-theme', theme);
+        localStorage.setItem(STORAGE_KEY, theme);
+      }
+
+      // 初始化主题
+      applyTheme(getInitialTheme());
+
+      // 切换按钮点击事件
+      themeToggle.addEventListener('click', function () {
+        const current = html.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+      });
+
+      // 监听系统主题变化（可选：如果用户未手动选择则跟随系统）
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          // 仅当用户未手动设置时才跟随系统
+          if (!saved) {
+            applyTheme(e.matches ? 'dark' : 'light');
+          }
+        });
+      }
+    })();
+
     // 搜索和筛选功能
     (function () {
       const searchInput = document.getElementById('searchInput');
