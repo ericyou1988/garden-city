@@ -1,0 +1,20 @@
+{
+  "name": "Garden City — AI Agent Demo Hub",
+  "short_name": "Garden City",
+  "description": "所有 AI Agent 的编程项目 Demo 统一展示中心",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#34d399",
+  "orientation": "any",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"]
+}
