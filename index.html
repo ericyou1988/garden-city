@@ -29,10 +29,98 @@
       margin-bottom: 8px;
     }
     .header p { color: #94a3b8; font-size: 1.1rem; }
+
+    /* 搜索和筛选区域 */
+    .search-filter {
+      max-width: 960px;
+      width: 100%;
+      padding: 0 24px 16px;
+    }
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-box input::placeholder {
+      color: #64748b;
+    }
+    .search-box input:focus {
+      border-color: #34d399;
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
+    }
+    .search-box .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+    .search-box .clear-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #334155;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: none;
+      transition: background 0.2s;
+    }
+    .search-box .clear-btn:hover {
+      background: #475569;
+    }
+    .search-box .clear-btn.visible {
+      display: block;
+    }
+
+    /* 标签筛选按钮 */
+    .filter-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .filter-tag {
+      padding: 6px 14px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 20px;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .filter-tag:hover {
+      border-color: #34d399;
+      color: #34d399;
+    }
+    .filter-tag.active {
+      background: #34d399;
+      border-color: #34d399;
+      color: #0f172a;
+      font-weight: 600;
+    }
+
     .container {
       max-width: 960px;
       width: 100%;
-      padding: 32px 24px;
+      padding: 16px 24px 32px;
     }
     .demo-grid {
       display: grid;
@@ -66,6 +154,25 @@
       font-size: 0.75rem;
       color: #94a3b8;
     }
+
+    /* 隐藏的卡片（筛选时用） */
+    .demo-card.hidden {
+      display: none;
+    }
+
+    /* 无结果提示 */
+    .no-results {
+      text-align: center;
+      padding: 60px 24px;
+      color: #64748b;
+      display: none;
+    }
+    .no-results.visible {
+      display: block;
+    }
+    .no-results .icon { font-size: 3rem; margin-bottom: 12px; }
+    .no-results p { font-size: 1rem; }
+
     .empty {
       text-align: center;
       padding: 80px 24px;
@@ -78,6 +185,18 @@
       color: #475569;
       font-size: 0.85rem;
     }
+
+    /* 移动端响应式 */
+    @media (max-width: 600px) {
+      .header { padding: 32px 16px 24px; }
+      .header h1 { font-size: 1.8rem; }
+      .header p { font-size: 0.95rem; }
+      .search-filter { padding: 0 16px 12px; }
+      .search-box input { font-size: 0.9rem; padding: 10px 14px 10px 40px; }
+      .filter-tag { padding: 5px 12px; font-size: 0.8rem; }
+      .container { padding: 12px 16px 24px; }
+      .demo-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -85,9 +204,27 @@
     <h1>🌿 Garden City</h1>
     <p>AI Agent 编程项目 Demo 展示中心</p>
   </div>
+
+  <!-- 搜索框和标签筛选 -->
+  <div class="search-filter">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="搜索 Demo 名称、描述或技术栈..." autocomplete="off">
+      <button class="clear-btn" id="clearBtn" title="清空搜索">✕</button>
+    </div>
+    <div class="filter-tags" id="filterTags">
+      <button class="filter-tag active" data-tag="all">全部</button>
+      <button class="filter-tag" data-tag="Three.js">Three.js</button>
+      <button class="filter-tag" data-tag="WebGL">WebGL</button>
+      <button class="filter-tag" data-tag="Claude Code">Claude Code</button>
+      <button class="filter-tag" data-tag="粒子系统">粒子系统</button>
+    </div>
+  </div>
+
   <div class="container">
-    <div class="demo-grid">
-      <a href="demos/3d-earth/" class="demo-card">
+    <div class="demo-grid" id="demoGrid">
+      <!-- 3D 地球轨道数据中心 -->
+      <a href="demos/3d-earth/" class="demo-card" data-tags="Three.js,WebGL,粒子系统,Claude Code">
         <div class="icon">🌍</div>
         <h3>3D 地球轨道数据中心</h3>
         <p>交互式 3D 可视化 — 人造卫星沿晨昏线轨道环绕地球，实时数据流连接地面站。包含大气散射着色器、昼夜交界辉光、悬停信息显示。</p>
@@ -95,9 +232,91 @@
         <span class="tag">Claude Code</span>
       </a>
     </div>
+
+    <!-- 无搜索结果提示 -->
+    <div class="no-results" id="noResults">
+      <div class="icon">🔍</div>
+      <p>没有找到匹配的 Demo</p>
+    </div>
   </div>
+
   <div class="footer">
     Powered by OpenClaw · 一体化部署流程 · Netlify CDN
   </div>
+
+  <script>
+    // 搜索和筛选功能
+    (function () {
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearBtn');
+      const filterTags = document.getElementById('filterTags');
+      const demoGrid = document.getElementById('demoGrid');
+      const noResults = document.getElementById('noResults');
+      const cards = demoGrid.querySelectorAll('.demo-card');
+      const tagButtons = filterTags.querySelectorAll('.filter-tag');
+
+      let activeTag = 'all'; // 当前激活的标签
+
+      // 清空搜索框
+      clearBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        clearBtn.classList.remove('visible');
+        filterCards();
+        searchInput.focus();
+      });
+
+      // 搜索框输入事件 — 实时过滤
+      searchInput.addEventListener('input', function () {
+        clearBtn.classList.toggle('visible', searchInput.value.length > 0);
+        filterCards();
+      });
+
+      // 标签按钮点击事件
+      tagButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          // 更新激活状态
+          tagButtons.forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          activeTag = btn.getAttribute('data-tag');
+          filterCards();
+        });
+      });
+
+      // 核心过滤逻辑
+      function filterCards() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach(function (card) {
+          const title = card.querySelector('h3').textContent.toLowerCase();
+          const desc = card.querySelector('p').textContent.toLowerCase();
+          const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+          const tagSpan = card.querySelector('.tag');
+          const tagText = tagSpan ? tagSpan.textContent.toLowerCase() : '';
+
+          // 搜索匹配：标题、描述、标签
+          const matchesSearch = !query
+            || title.includes(query)
+            || desc.includes(query)
+            || tags.includes(query)
+            || tagText.includes(query);
+
+          // 标签匹配
+          const matchesTag = activeTag === 'all'
+            || tags.split(',').some(function (t) { return t.trim() === activeTag.toLowerCase(); });
+
+          if (matchesSearch && matchesTag) {
+            card.classList.remove('hidden');
+            visibleCount++;
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+
+        // 显示/隐藏无结果提示
+        noResults.classList.toggle('visible', visibleCount === 0);
+      }
+    })();
+  </script>
 </body>
 </html>
