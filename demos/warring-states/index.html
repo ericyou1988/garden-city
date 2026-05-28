@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="春秋战国历史地图展示 - 从烽火戏诸侯到秦始皇统一中国的历史变迁">
+  <title>春秋战国历史地图 | 从烽火戏诸侯到秦始皇统一</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 返回主页按钮 -->
+  <div class="back-btn-container">
+    <a href="../../index.html" class="back-btn" title="返回主页">
+      ⬅ 返回主页
+    </a>
+  </div>
+
+  <!-- 头部区域 -->
+  <header class="header">
+    <h1>🏛️ 春秋战国历史地图</h1>
+    <p class="subtitle">从烽火戏诸侯到秦始皇统一中国（公元前770年 - 公元前221年）</p>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="main-content">
+    <!-- 左侧：地图区域 -->
+    <section class="map-section">
+      <div class="section-title">
+        <h2>📍 诸侯国疆域变迁</h2>
+        <p>拖动时间轴查看不同时期的疆域变化</p>
+      </div>
+      
+      <div class="map-container">
+        <canvas id="mapCanvas"></canvas>
+        <div class="map-legend" id="mapLegend"></div>
+      </div>
+
+      <!-- 时间轴控制 -->
+      <div class="timeline-control">
+        <div class="timeline-labels">
+          <span class="timeline-start">前770年</span>
+          <span class="timeline-end">前221年</span>
+        </div>
+        <input type="range" id="timelineSlider" min="0" max="100" value="0" step="1">
+        <div class="timeline-year" id="timelineYear">
+          <strong>公元前770年</strong> — 平王东迁，东周开始
+        </div>
+      </div>
+
+      <!-- 时期选择 -->
+      <div class="period-selector">
+        <button class="period-btn active" data-year="0">春秋初期</button>
+        <button class="period-btn" data-year="25">春秋中期</button>
+        <button class="period-btn" data-year="50">春秋末期</button>
+        <button class="period-btn" data-year="60">战国初期</button>
+        <button class="period-btn" data-year="75">战国中期</button>
+        <button class="period-btn" data-year="90">战国末期</button>
+        <button class="period-btn" data-year="100">秦统一</button>
+      </div>
+    </section>
+
+    <!-- 右侧：信息面板 -->
+    <aside class="info-panel">
+      <!-- 国家列表 -->
+      <div class="info-card">
+        <h3>🏰 诸侯国</h3>
+        <div class="state-list" id="stateList"></div>
+      </div>
+
+      <!-- 事件时间线 -->
+      <div class="info-card">
+        <h3>📜 关键事件</h3>
+        <div class="events-list" id="eventsList"></div>
+      </div>
+
+      <!-- 历史人物 -->
+      <div class="info-card">
+        <h3>👤 历史人物</h3>
+        <div class="figures-list" id="figuresList"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 科普内容区域 -->
+  <section class="edu-section">
+    <div class="edu-container">
+      <h2>📚 历史科普</h2>
+      
+      <div class="edu-content">
+        <article class="edu-article">
+          <h3>什么是春秋战国？</h3>
+          <p>春秋战国（公元前770年-公元前221年）是中国历史上一个重要的变革时期，分为两个阶段：</p>
+          <ul>
+            <li><strong>春秋时期</strong>（前770-前476）：因孔子编订的《春秋》而得名，周天子权威衰落，诸侯争霸</li>
+            <li><strong>战国时期</strong>（前475-前221）：因西汉刘向编订的《战国策》而得名，七雄并立，兼并战争激烈</li>
+          </ul>
+        </article>
+
+        <article class="edu-article">
+          <h3>春秋五霸</h3>
+          <p>春秋时期，先后有五位诸侯称霸中原：</p>
+          <ol>
+            <li><strong>齐桓公</strong> — 任用管仲，尊王攘夷，九合诸侯</li>
+            <li><strong>宋襄公</strong> — 仁义之霸（有争议）</li>
+            <li><strong>晋文公</strong> — 城濮之战大败楚军</li>
+            <li><strong>秦穆公</strong> — 称霸西戎</li>
+            <li><strong>楚庄王</strong> — 问鼎中原，一鸣惊人</li>
+          </ol>
+        </article>
+
+        <article class="edu-article">
+          <h3>战国七雄</h3>
+          <p>战国时期，七个最强大的诸侯国被称为"战国七雄"：</p>
+          <div class="seven-powers">
+            <span class="power qi">齐</span>
+            <span class="power chu">楚</span>
+            <span class="power yan">燕</span>
+            <span class="power han">韩</span>
+            <span class="power zhao">赵</span>
+            <span class="power wei">魏</span>
+            <span class="power qin">秦</span>
+          </div>
+          <p>记忆口诀：<strong>齐楚燕韩赵魏秦</strong>（东南西北到中间）</p>
+        </article>
+
+        <article class="edu-article">
+          <h3>秦始皇统一</h3>
+          <p>公元前230年-前221年，秦始皇嬴政发动统一战争，先后灭掉六国：</p>
+          <ol>
+            <li>前230年 — 灭韩</li>
+            <li>前228年 — 灭赵</li>
+            <li>前227年 — 荆轲刺秦（失败）</li>
+            <li>前225年 — 灭魏</li>
+            <li>前223年 — 灭楚</li>
+            <li>前222年 — 灭燕、赵残余</li>
+            <li>前221年 — 灭齐，统一完成</li>
+          </ol>
+          <p>秦始皇建立秦朝，自称"始皇帝"，开创了中国两千多年的中央集权制度。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 访问统计 -->
+  <script src="../../stats.js"></script>
+  <script>GardenStats.autoTrack();</script>
+
+  <!-- 主脚本 -->
+  <script src="script.js"></script>
+</body>
+</html>
