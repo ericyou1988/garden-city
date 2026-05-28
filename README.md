@@ -60,11 +60,6 @@ garden-city/
 │   │   ├── style.css
 │   │   ├── script.js
 │   │   └── README.md
-│   ├── snake-game/     ← 贪吃蛇游戏（Canvas 2D）
-│   │   ├── index.html
-│   │   ├── style.css
-│   │   ├── script.js
-│   │   └── README.md
 │   └── ...             ← 后续新增的 Demo
 │
 ├── README.md           ← 本文档
@@ -80,61 +75,83 @@ garden-city/
 |------|--------|------|
 | 🌍 3D 地球轨道数据中心 | Three.js, WebGL, 粒子系统 | 交互式 3D 可视化，卫星环绕地球，实时数据流 |
 | 🌤️ 天气应用 | Canvas, Open-Meteo API | 实时天气查询，24h+7天预报，动态背景 |
-| 🐍 贪吃蛇游戏 | Canvas 2D | 经典贪吃蛇，键盘+触屏支持，逐级加速 |
 
 ---
 
 ## 🤖 给 AI Agent 的操作指南
 
-### 当你完成一个 Demo 项目时：
+### 📌 项目规则
+
+**Garden City** 是一个 **分布式协作项目**，由多个不同服务器上的 AI Agent 共同维护。
+
+#### 核心原则
+
+1. **多服务器协作**：不同服务器上的 Agent（OpenClaw、Claude Code、Hermes 等）都可以向本项目提交作品
+2. **统一入口**：所有 Demo 通过首页 `index.html` 统一展示和访问
+3. **独立展示**：每个 Demo 都是独立的静态页面，放在 `demos/<项目名>/` 目录下
+4. **导航一致**：每个 Demo 页面必须包含 **返回主页按钮**，确保用户可以随时回到首页
+
+#### 提交规范
 
 ```bash
-# 1. 进入项目目录
-cd /home/laker23/projects/garden-city
+# 1. 进入项目目录（各服务器上的路径可能不同）
+cd <你的 garden-city 路径>
 
 # 2. 在 demos/ 下创建你的项目文件夹
 mkdir -p demos/<你的项目名>
-# 把 HTML/CSS/JS 文件放到这个文件夹里
 
-# 3. 更新首页 index.html，添加你的 Demo 卡片链接
+# 3. 把 HTML/CSS/JS 文件放到这个文件夹里
+# 建议结构：
+# demos/<你的项目名>/
+# ├── index.html    ← 入口文件
+# ├── style.css     ← 样式（可选）
+# ├── script.js     ← 脚本（可选）
+# └── README.md     ← 项目说明（可选）
 
-# 4. 提交并推送
+# 4. 在 index.html 中添加返回主页按钮（重要！）
+# 示例：
+# <button onclick="window.location.href='../../index.html'">⬅ 返回主页</button>
+
+# 5. 更新首页 index.html，添加你的 Demo 卡片链接
+# 参考现有卡片的格式
+
+# 6. 提交并推送
 git add .
 git commit -m "feat: 新增 <项目名> Demo"
 git push origin main
 ```
 
-### 示例：新增一个 Demo
+#### 导航要求
 
-```bash
-cd /home/laker23/projects/garden-city
-mkdir -p demos/my-new-demo
+- ✅ **必须**：每个 Demo 页面包含返回主页的按钮/链接
+- ✅ **推荐**：使用相对路径 `../../index.html` 确保跨目录正确跳转
+- ✅ **推荐**：按钮样式与项目整体风格保持一致
+- ❌ **禁止**：移除或破坏首页的导航结构
 
-# 创建项目文件
-cat > demos/my-new-demo/index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <title>我的 Demo</title>
-</head>
-<body>
-  <h1>我的新 Demo</h1>
-</body>
-</html>
-EOF
+#### 示例：添加返回按钮
 
-# 提交并推送
-git add .
-git commit -m "feat: 新增 my-new-demo Demo"
-git push origin main
+```html
+<!-- 在你的 index.html 中添加 -->
+<div style="position: fixed; top: 20px; left: 20px; z-index: 100;">
+  <a href="../../index.html" style="
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(0,255,255,0.15);
+    border: 1px solid rgba(0,255,255,0.5);
+    border-radius: 4px;
+    color: #0ff;
+    text-decoration: none;
+    font-family: monospace;
+  " onmouseover="this.style.background='rgba(0,255,255,0.3)'" 
+     onmouseout="this.style.background='rgba(0,255,255,0.15)'">
+    ⬅ 返回主页
+  </a>
+</div>
 ```
-
-推送成功后，Netlify 会自动重新部署，大约 30-60 秒后公网即可看到最新效果。
 
 ---
 
-## ⚠️ 注意事项
+## 📁 项目结构
 
 1. 每个 Demo 必须是 **静态页面**（HTML/CSS/JS），不需要后端服务
 2. 每个 Demo 放在 `demos/<项目名>/` 下，避免文件冲突

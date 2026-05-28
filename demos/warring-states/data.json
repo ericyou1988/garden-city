@@ -1,0 +1,278 @@
+{
+  "period": {
+    "name": "春秋战国",
+    "start": -770,
+    "end": -221,
+    "description": "东周时期，分为春秋（前770-前476）和战国（前475-前221）两个阶段"
+  },
+  "states": [
+    {
+      "id": "zhou",
+      "name": "周",
+      "capital": "镐京→洛邑",
+      "start": -1046,
+      "end": -256,
+      "color": "#8B4513",
+      "description": "东周分为春秋和战国两个时期，周天子权威逐渐衰落"
+    },
+    {
+      "id": "qi",
+      "name": "齐",
+      "capital": "临淄",
+      "start": -1046,
+      "end": -221,
+      "color": "#FF6B35",
+      "description": "春秋首霸，齐桓公九合诸侯。战国时田氏代齐"
+    },
+    {
+      "id": "jin",
+      "name": "晋",
+      "capital": "绛→新田",
+      "start": -1030,
+      "end": -376,
+      "color": "#4ECDC4",
+      "description": "春秋强国，后三家分晋，开启战国时代"
+    },
+    {
+      "id": "chu",
+      "name": "楚",
+      "capital": "郢→陈→寿春",
+      "start": -1042,
+      "end": -223,
+      "color": "#E74C3C",
+      "description": "南方大国，楚庄王问鼎中原，战国最强诸侯"
+    },
+    {
+      "id": "qin",
+      "name": "秦",
+      "capital": "雍→咸阳",
+      "start": -770,
+      "end": -207,
+      "color": "#2C3E50",
+      "description": "西陲小国，商鞅变法后崛起，最终统一六国"
+    },
+    {
+      "id": "yan",
+      "name": "燕",
+      "capital": "蓟",
+      "start": -1044,
+      "end": -222,
+      "color": "#9B59B6",
+      "description": "最北方的诸侯国，燕昭王筑黄金台招贤"
+    },
+    {
+      "id": "han",
+      "name": "韩",
+      "capital": "郑",
+      "start": -403,
+      "end": -230,
+      "color": "#F39C12",
+      "description": "三家分晋之一，战国七雄中最弱"
+    },
+    {
+      "id": "zhao",
+      "name": "赵",
+      "capital": "晋阳→邯郸",
+      "start": -403,
+      "end": -222,
+      "color": "#1ABC9C",
+      "description": "三家分晋之一，赵武灵王胡服骑射"
+    },
+    {
+      "id": "wei",
+      "name": "魏",
+      "capital": "安邑→大梁",
+      "start": -403,
+      "end": -225,
+      "color": "#3498DB",
+      "description": "三家分晋之一，战国初期最强，后衰落"
+    }
+  ],
+  "events": [
+    {
+      "year": -771,
+      "title": "烽火戏诸侯",
+      "description": "周幽王为博褒姒一笑，烽火戏诸侯，犬戎攻破镐京，周幽王被杀",
+      "category": "周室衰微"
+    },
+    {
+      "year": -770,
+      "title": "平王东迁",
+      "description": "周平王迁都洛邑，东周正式建立，春秋时代开始",
+      "category": "东周建立"
+    },
+    {
+      "year": -685,
+      "title": "齐桓公即位",
+      "description": "齐桓公任用管仲进行改革，成为春秋首霸",
+      "category": "春秋五霸"
+    },
+    {
+      "year": -597,
+      "title": "邲之战",
+      "description": "楚庄王大败晋军，问鼎中原，成为春秋霸主",
+      "category": "春秋五霸"
+    },
+    {
+      "year": -453,
+      "title": "三家分晋",
+      "description": "韩、赵、魏三家瓜分晋国，战国时代正式开始",
+      "category": "战国开端"
+    },
+    {
+      "year": -356,
+      "title": "商鞅变法",
+      "description": "秦孝公任用商鞅变法，秦国国力大增，为统一奠定基础",
+      "category": "秦国崛起"
+    },
+    {
+      "year": -279,
+      "title": "渑池之会",
+      "description": "秦昭襄王与赵惠文王会盟，蔺相如完璧归赵",
+      "category": "秦赵对峙"
+    },
+    {
+      "year": -260,
+      "title": "长平之战",
+      "description": "秦将白起大败赵军，坑杀四十万降卒，赵国元气大伤",
+      "category": "关键战役"
+    },
+    {
+      "year": -230,
+      "title": "秦灭韩",
+      "description": "秦始皇开始统一战争，首先灭掉韩国",
+      "category": "统一战争"
+    },
+    {
+      "year": -228,
+      "title": "秦灭赵",
+      "description": "秦军攻破邯郸，赵王被俘，赵国灭亡",
+      "category": "统一战争"
+    },
+    {
+      "year": -227,
+      "title": "荆轲刺秦",
+      "description": "燕太子丹派荆轲刺杀秦始皇，失败",
+      "category": "统一战争"
+    },
+    {
+      "year": -225,
+      "title": "秦灭魏",
+      "description": "秦将王贲水淹大梁，魏国灭亡",
+      "category": "统一战争"
+    },
+    {
+      "year": -223,
+      "title": "秦灭楚",
+      "description": "秦将王翦率六十万大军灭楚",
+      "category": "统一战争"
+    },
+    {
+      "year": -222,
+      "title": "秦灭燕、赵残余",
+      "description": "燕国和赵国残余势力被彻底消灭",
+      "category": "统一战争"
+    },
+    {
+      "year": -221,
+      "title": "秦始皇统一",
+      "description": "秦灭齐，完成统一大业，建立秦朝，秦始皇称帝",
+      "category": "统一完成"
+    }
+  ],
+  "battles": [
+    {
+      "year": -684,
+      "name": "长勺之战",
+      "combatants": ["齐", "鲁"],
+      "winner": "鲁",
+      "description": "曹刿论战，鲁国以弱胜强"
+    },
+    {
+      "year": -597,
+      "name": "邲之战",
+      "combatants": ["楚", "晋"],
+      "winner": "楚",
+      "description": "楚庄王称霸中原"
+    },
+    {
+      "year": -575,
+      "name": "鄢陵之战",
+      "combatants": ["晋", "楚"],
+      "winner": "晋",
+      "description": "晋楚争霸的关键战役"
+    },
+    {
+      "year": -453,
+      "name": "晋阳之战",
+      "combatants": ["智伯", "韩赵魏"],
+      "winner": "韩赵魏",
+      "description": "三家灭智，奠定分晋基础"
+    },
+    {
+      "year": -341,
+      "name": "马陵之战",
+      "combatants": ["魏", "齐"],
+      "winner": "齐",
+      "description": "孙膑减灶诱敌，魏国衰落"
+    },
+    {
+      "year": -260,
+      "name": "长平之战",
+      "combatants": ["秦", "赵"],
+      "winner": "秦",
+      "description": "中国古代最大规模战役，四十万赵军被坑杀"
+    },
+    {
+      "year": -278,
+      "name": "鄢郢之战",
+      "combatants": ["秦", "楚"],
+      "winner": "秦",
+      "description": "白起攻破楚国都城郢"
+    }
+  ],
+  "figures": [
+    {
+      "name": "周幽王",
+      "period": "西周",
+      "role": "周天子",
+      "story": "烽火戏诸侯，导致西周灭亡"
+    },
+    {
+      "name": "齐桓公",
+      "period": "春秋",
+      "role": "齐国国君",
+      "story": "春秋首霸，九合诸侯，一匡天下"
+    },
+    {
+      "name": "管仲",
+      "period": "春秋",
+      "role": "齐国宰相",
+      "story": "辅佐齐桓公称霸，提出尊王攘夷"
+    },
+    {
+      "name": "楚庄王",
+      "period": "春秋",
+      "role": "楚国国君",
+      "story": "一鸣惊人，问鼎中原"
+    },
+    {
+      "name": "商鞅",
+      "period": "战国",
+      "role": "秦国改革家",
+      "story": "变法强国，徙木立信"
+    },
+    {
+      "name": "秦始皇",
+      "period": "战国→秦",
+      "role": "秦王→皇帝",
+      "story": "横扫六国，统一中国，建立第一个中央集权帝国"
+    },
+    {
+      "name": "荆轲",
+      "period": "战国",
+      "role": "刺客",
+      "story": "风萧萧兮易水寒，壮士一去兮不复还"
+    }
+  ]
+}
