@@ -4,11 +4,21 @@
 <meta name="description" content="3D 地球轨道数据中心 Demo - 使用 Three.js 构建的太空数据中心可视化，展示卫星轨道和数据流">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Orbital Datacenter — Dawn Terminator</title>
+<title>Orbital Datacenter — 轨道数据中心</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+body { background: #000; overflow: hidden; font-family: 'Courier New', 'Noto Sans SC', monospace; }
 canvas { display: block; }
+
+/* Language toggle button */
+#lang-toggle {
+  position: fixed; top: 20px; right: 20px; z-index: 20;
+  background: rgba(0,255,255,0.08); border: 1px solid rgba(0,255,255,0.3);
+  color: #0ff; padding: 6px 14px; font-size: 12px; cursor: pointer;
+  font-family: 'Courier New', monospace; letter-spacing: 1px;
+  transition: all 0.2s;
+}
+#lang-toggle:hover { background: rgba(0,255,255,0.2); border-color: #0ff; }
 
 #hud {
   position: fixed; top: 20px; left: 20px; z-index: 10;
@@ -51,26 +61,28 @@ canvas { display: block; }
 </head>
 <body>
 
+<button id="lang-toggle" onclick="toggleLang()">中文</button>
+
 <div id="hud">
-  <h1>Orbital Datacenter</h1>
-  <div class="stat">Active Satellites: <span id="sat-count">0</span></div>
-  <div class="stat">Data Streams: <span id="stream-count">0</span></div>
-  <div class="stat">Uplink Bandwidth: <span id="bw">0</span> Gbps</div>
-  <div class="stat">Orbital Altitude: <span id="alt">420</span> km LEO</div>
-  <div class="stat">Terminator Phase: <span id="phase">Dawn</span></div>
-  <div class="stat">System Time: <span id="clock">--:--:--</span></div>
+  <h1 data-i18n="title">Orbital Datacenter</h1>
+  <div class="stat"><span data-i18n="satellites">Active Satellites</span>: <span id="sat-count">0</span></div>
+  <div class="stat"><span data-i18n="streams">Data Streams</span>: <span id="stream-count">0</span></div>
+  <div class="stat"><span data-i18n="bandwidth">Uplink Bandwidth</span>: <span id="bw">0</span> Gbps</div>
+  <div class="stat"><span data-i18n="altitude">Orbital Altitude</span>: <span id="alt">420</span> km LEO</div>
+  <div class="stat"><span data-i18n="phase">Terminator Phase</span>: <span id="phase">Dawn</span></div>
+  <div class="stat"><span data-i18n="sysTime">System Time</span>: <span id="clock">--:--:--</span></div>
 </div>
 
-<div id="legend">DRAG TO ORBIT &nbsp;|&nbsp; SCROLL TO ZOOM &nbsp;|&nbsp; CLICK SATELLITES FOR INFO</div>
+<div id="legend" data-i18n="legend">DRAG TO ORBIT &nbsp;|&nbsp; SCROLL TO ZOOM &nbsp;|&nbsp; CLICK SATELLITES FOR INFO</div>
 
 <div id="tooltip"></div>
 
 <div id="controls">
-  <button id="btn-back" onclick="window.location.href='../../index.html'" style="background:rgba(0,255,255,0.15); border-color:#0ff; font-weight:bold;">⬅ 主页</button>
-  <button id="btn-rotate" class="active" onclick="toggleAutoRotate()">AUTO-ROTATE</button>
-  <button id="btn-streams" class="active" onclick="toggleStreams()">DATA STREAMS</button>
-  <button id="btn-labels" onclick="toggleLabels()">LABELS</button>
-  <button id="btn-reset" onclick="resetCamera()">RESET VIEW</button>
+  <button id="btn-back" onclick="window.location.href='../../index.html'" style="background:rgba(0,255,255,0.15); border-color:#0ff; font-weight:bold;">⬅ <span data-i18n="back">主页</span></button>
+  <button id="btn-rotate" class="active" onclick="toggleAutoRotate()"><span data-i18n="rotate">AUTO-ROTATE</span></button>
+  <button id="btn-streams" class="active" onclick="toggleStreams()"><span data-i18n="streamsBtn">DATA STREAMS</span></button>
+  <button id="btn-labels" onclick="toggleLabels()"><span data-i18n="labelsBtn">LABELS</span></button>
+  <button id="btn-reset" onclick="resetCamera()"><span data-i18n="resetBtn">RESET VIEW</span></button>
 </div>
 
 <script type="importmap">
@@ -79,6 +91,76 @@ canvas { display: block; }
     "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
     "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
   }
+}
+</script>
+
+<script>
+// ── i18n ──
+const I18N = {
+  en: {
+    title: 'Orbital Datacenter',
+    satellites: 'Active Satellites',
+    streams: 'Data Streams',
+    bandwidth: 'Uplink Bandwidth',
+    altitude: 'Orbital Altitude',
+    phase: 'Terminator Phase',
+    sysTime: 'System Time',
+    legend: 'DRAG TO ORBIT &nbsp;|&nbsp; SCROLL TO ZOOM &nbsp;|&nbsp; CLICK SATELLITES FOR INFO',
+    back: '主页',
+    rotate: 'AUTO-ROTATE',
+    streamsBtn: 'DATA STREAMS',
+    labelsBtn: 'LABELS',
+    resetBtn: 'RESET VIEW',
+    langBtn: '中文',
+    groundStations: {
+      'San Francisco': 'San Francisco',
+      'London': 'London',
+      'Tokyo': 'Tokyo',
+      'Sydney': 'Sydney',
+      'Singapore': 'Singapore'
+    }
+  },
+  zh: {
+    title: '轨道数据中心',
+    satellites: '活跃卫星',
+    streams: '数据流',
+    bandwidth: '上行带宽',
+    altitude: '轨道高度',
+    phase: '晨昏线相位',
+    sysTime: '系统时间',
+    legend: '拖拽旋转 &nbsp;|&nbsp; 滚轮缩放 &nbsp;|&nbsp; 点击卫星查看详情',
+    back: 'Home',
+    rotate: '自动旋转',
+    streamsBtn: '数据流',
+    labelsBtn: '标签',
+    resetBtn: '重置视角',
+    langBtn: 'English',
+    groundStations: {
+      'San Francisco': '旧金山',
+      'London': '伦敦',
+      'Tokyo': '东京',
+      'Sydney': '悉尼',
+      'Singapore': '新加坡'
+    }
+  }
+};
+
+let currentLang = 'en';
+
+window.toggleLang = () => {
+  currentLang = currentLang === 'en' ? 'zh' : 'en';
+  applyLang();
+};
+
+function applyLang() {
+  const dict = I18N[currentLang];
+  document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+  document.getElementById('lang-toggle').textContent = dict.langBtn;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key]) el.textContent = dict[key];
+  });
 }
 </script>
 
@@ -460,11 +542,11 @@ for (let i = 0; i < satellites.length; i++) {
 
 // Create satellite-to-Earth links (ground stations)
 const groundStations = [
-  { lat: 37.77, lon: -122.42, name: 'San Francisco' },
-  { lat: 51.51, lon: -0.13, name: 'London' },
-  { lat: 35.68, lon: 139.69, name: 'Tokyo' },
-  { lat: -33.87, lon: 151.21, name: 'Sydney' },
-  { lat: 1.35, lon: 103.82, name: 'Singapore' },
+  { lat: 37.77, lon: -122.42, nameEn: 'San Francisco', nameZh: '旧金山' },
+  { lat: 51.51, lon: -0.13, nameEn: 'London', nameZh: '伦敦' },
+  { lat: 35.68, lon: 139.69, nameEn: 'Tokyo', nameZh: '东京' },
+  { lat: -33.87, lon: 151.21, nameEn: 'Sydney', nameZh: '悉尼' },
+  { lat: 1.35, lon: 103.82, nameEn: 'Singapore', nameZh: '新加坡' },
 ];
 
 groundStations.forEach(gs => {
@@ -485,6 +567,27 @@ groundStations.forEach(gs => {
   const gsMesh = new THREE.Mesh(gsGeo, gsMat);
   gsMesh.position.copy(gsPos);
   earth.add(gsMesh);
+
+  // Bilingual label
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 64;
+  const ctxLabel = canvas.getContext('2d');
+  ctxLabel.font = 'bold 22px Courier New';
+  ctxLabel.fillStyle = '#00ffaa';
+  ctxLabel.textAlign = 'center';
+  ctxLabel.textBaseline = 'middle';
+  ctxLabel.fillText(currentLang === 'zh' ? gs.nameZh : gs.nameEn, 128, 32);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  const labelMat = new THREE.SpriteMaterial({
+    map: tex, transparent: true, opacity: 0.7,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+  const labelSprite = new THREE.Sprite(labelMat);
+  labelSprite.scale.set(0.5, 0.12, 1);
+  labelSprite.position.copy(gsPos);
+  labelSprite.position.y += 0.08;
+  earth.add(labelSprite);
 
   // Connect to nearest satellite
   let nearest = null, minDist = Infinity;
@@ -614,15 +717,27 @@ renderer.domElement.addEventListener('mousemove', (e) => {
   if (intersects.length > 0) {
     const sat = intersects[0].object;
     const d = sat.userData;
+    const lang = currentLang;
+    const phaseMap = { 'Dawn': '晨昏线·黎明', 'Dusk': '晨昏线·黄昏' };
+    const phaseText = lang === 'zh' ? (phaseMap[d.phase] || d.phase) : d.phase;
     tooltip.style.display = 'block';
     tooltip.style.left = (e.clientX + 15) + 'px';
     tooltip.style.top = (e.clientY - 10) + 'px';
-    tooltip.innerHTML = `
-      <strong style="color:#0ff">${d.name}</strong><br>
-      Orbit: ${d.orbit} | Altitude: ${(d.altitude * 6371).toFixed(0)} km<br>
-      Speed: ${d.speed.toFixed(2)} rad/s<br>
-      Link: ${d.color.toString(16)}
-    `;
+    if (lang === 'zh') {
+      tooltip.innerHTML = `
+        <strong style="color:#0ff">${d.name}</strong><br>
+        轨道面: ${d.orbit} | 高度: ${(d.altitude * 6371).toFixed(0)} km<br>
+        速度: ${d.speed.toFixed(2)} rad/s<br>
+        相位: ${phaseText}
+      `;
+    } else {
+      tooltip.innerHTML = `
+        <strong style="color:#0ff">${d.name}</strong><br>
+        Orbit: ${d.orbit} | Altitude: ${(d.altitude * 6371).toFixed(0)} km<br>
+        Speed: ${d.speed.toFixed(2)} rad/s<br>
+        Phase: ${phaseText}
+      `;
+    }
     document.body.style.cursor = 'pointer';
   } else {
     tooltip.style.display = 'none';
@@ -734,12 +849,15 @@ function animate() {
   document.getElementById('sat-count').textContent = satellites.length;
   document.getElementById('stream-count').textContent = dataStreams.length;
   document.getElementById('bw').textContent = (satellites.length * 12.4 + Math.sin(elapsed) * 5).toFixed(1);
-  document.getElementById('phase').textContent = 'Dawn';
+  document.getElementById('phase').textContent = currentLang === 'zh' ? '晨昏线·黎明' : 'Dawn';
   document.getElementById('clock').textContent = new Date().toISOString().substr(11, 8);
 
   controls.update();
   renderer.render(scene, camera);
 }
+
+// Apply initial language state
+applyLang();
 
 animate();
 
