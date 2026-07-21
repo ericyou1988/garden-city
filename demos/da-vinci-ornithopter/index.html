@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="达芬奇扑翼机 Three.js 三维交互展示 - 旋转缩放与爆炸图">
+  <title>达芬奇扑翼机 — Three.js 机械展示</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 加载覆盖层 -->
+  <div class="loading-overlay" id="loading">
+    <div class="loading-spinner"></div>
+    <span class="loading-text">正在加载三维模型...</span>
+  </div>
+
+  <!-- 3D 画布容器 -->
+  <div id="canvas-container"></div>
+
+  <!-- 顶部 HUD -->
+  <div class="top-hud">
+    <div class="hud-title">
+      <h1>🛸 达芬奇扑翼机</h1>
+      <p>Three.js · 机械结构交互展示</p>
+    </div>
+    <div class="hud-stats">
+      <div>FPS: <span id="fps-counter">60</span></div>
+      <div>部件: <span id="part-count">8</span></div>
+    </div>
+  </div>
+
+  <!-- 右侧信息面板 -->
+  <div class="side-panel" id="sidePanel">
+    <div class="panel-section">
+      <h3>📐 历史背景</h3>
+      <p>
+        列奥纳多·达·芬奇（1452-1519）在 1485 年左右设计了扑翼机（Ornithopter），
+        这是人类最早的飞行器设计之一。其原理是通过模仿鸟类扑翼产生升力，
+        利用人力驱动机械结构实现飞行。
+      </p>
+    </div>
+
+    <div class="panel-section">
+      <h3>⚙️ 部件说明</h3>
+      <div class="parts-list" id="partsList">
+        <!-- 由 JS 动态填充 -->
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <h3>🔬 工作原理</h3>
+      <p>
+        飞行员通过脚踏踏板驱动曲柄机构，带动四连杆系统使机翼上下扑动。
+        机翼的弯曲形状模仿鸟类翅膀，利用空气动力学原理产生推力与升力。
+        尾翼用于控制方向，保持飞行稳定性。
+      </p>
+    </div>
+  </div>
+
+  <!-- 底部信息栏 -->
+  <div class="bottom-bar">
+    <div class="key-hint">
+      <kbd>鼠标左键</kbd> 旋转视角
+    </div>
+    <div class="key-hint">
+      <kbd>滚轮</kbd> 缩放
+    </div>
+    <div class="key-hint">
+      <kbd>鼠标右键</kbd> 平移
+    </div>
+    <div class="key-hint">
+      <kbd>点击部件</kbd> 高亮显示
+    </div>
+  </div>
+
+  <!-- 控制面板 -->
+  <div class="controls">
+    <button class="ctrl-btn" id="btn-explode" onclick="toggleExplode()">💥 爆炸图</button>
+    <button class="ctrl-btn" id="btn-rotate" onclick="toggleAutoRotate()">🔄 自动旋转</button>
+    <button class="ctrl-btn" id="btn-reset" onclick="resetCamera()">🎯 重置视角</button>
+    <button class="ctrl-btn" id="btn-wireframe" onclick="toggleWireframe()">🔲 线框模式</button>
+    <button class="ctrl-btn" id="btn-back" onclick="window.location.href='../../index.html'">⬅ 主页</button>
+  </div>
+
+  <!-- 部件提示标签 -->
+  <div class="tooltip" id="tooltip"></div>
+
+  <!-- ES Module 导入映射 -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
