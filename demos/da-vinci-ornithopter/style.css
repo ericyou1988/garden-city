@@ -1,26 +1,23 @@
-/* ========== 基础重置 ========== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-card: rgba(20, 20, 30, 0.85);
-  --text-primary: #e0e0e0;
-  --text-secondary: #a0a0b0;
+  --bg: #0a0a0f;
+  --card: rgba(20, 20, 30, 0.85);
+  --text: #e0e0e0;
+  --text2: #a0a0b0;
   --accent: #00d4ff;
-  --accent-glow: rgba(0, 212, 255, 0.4);
-  --border: rgba(255, 255, 255, 0.08);
-  --hud-bg: rgba(10, 15, 25, 0.9);
+  --accent2: #00ffa3;
+  --border: rgba(255,255,255,0.08);
 }
 
 body {
-  font-family: 'Segoe UI', 'Noto Sans SC', sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
   overflow: hidden;
   height: 100vh;
 }
 
-/* ========== 画布容器 ========== */
 #canvas-container {
   position: fixed;
   inset: 0;
@@ -31,7 +28,7 @@ canvas {
   display: block;
 }
 
-/* ========== 顶部 HUD ========== */
+/* ========== TOP HUD ========== */
 .top-hud {
   position: fixed;
   top: 0;
@@ -39,43 +36,29 @@ canvas {
   right: 0;
   z-index: 10;
   padding: 20px 30px;
-  background: linear-gradient(180deg, rgba(10, 10, 15, 0.95) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(10,10,15,0.95) 0%, transparent 100%);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  pointer-events: none;
 }
 
-.hud-title h1 {
+.top-hud h1 {
   font-size: 1.4rem;
   font-weight: 600;
   letter-spacing: 2px;
-  text-transform: uppercase;
-  background: linear-gradient(90deg, var(--accent), #fff);
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.hud-title p {
+.top-hud p {
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: var(--text2);
   margin-top: 4px;
-  letter-spacing: 1px;
 }
 
-.hud-stats {
-  display: flex;
-  gap: 20px;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-}
-
-.hud-stats span {
-  color: var(--accent);
-  font-family: 'Courier New', monospace;
-  font-weight: 600;
-}
-
-/* ========== 右侧面板 ========== */
+/* ========== SIDE PANEL ========== */
 .side-panel {
   position: fixed;
   top: 80px;
@@ -83,24 +66,15 @@ canvas {
   bottom: 100px;
   width: 300px;
   z-index: 10;
-  background: var(--hud-bg);
+  background: rgba(10,15,25,0.9);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px;
   overflow-y: auto;
   backdrop-filter: blur(10px);
-  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.panel-section {
-  margin-bottom: 24px;
-}
-
-.panel-section:last-child {
-  margin-bottom: 0;
-}
-
-.panel-section h3 {
+.side-panel h3 {
   font-size: 0.75rem;
   color: var(--accent);
   text-transform: uppercase;
@@ -110,46 +84,45 @@ canvas {
   border-bottom: 1px solid var(--border);
 }
 
-.panel-section p {
+.side-panel p {
   font-size: 0.85rem;
   line-height: 1.6;
-  color: var(--text-secondary);
+  color: var(--text2);
 }
 
-/* ========== 部件列表 ========== */
-.parts-list {
+.side-panel .parts {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.part-item {
+.side-panel .part-item {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: var(--text2);
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid transparent;
 }
 
-.part-item:hover {
+.side-panel .part-item:hover {
   background: rgba(0, 212, 255, 0.08);
   border-color: var(--accent);
-  color: var(--text-primary);
+  color: var(--text);
 }
 
-.part-color {
+.side-panel .part-color {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-/* ========== 控制面板 ========== */
+/* ========== CONTROLS ========== */
 .controls {
   position: fixed;
   bottom: 20px;
@@ -159,13 +132,13 @@ canvas {
   display: flex;
   gap: 10px;
   padding: 12px 20px;
-  background: var(--hud-bg);
+  background: rgba(10,15,25,0.9);
   border: 1px solid var(--border);
   border-radius: 30px;
   backdrop-filter: blur(10px);
 }
 
-.ctrl-btn {
+.controls button {
   padding: 8px 18px;
   background: rgba(0, 212, 255, 0.08);
   border: 1px solid rgba(0, 212, 255, 0.25);
@@ -177,61 +150,21 @@ canvas {
   transition: all 0.2s;
   white-space: nowrap;
   font-family: inherit;
-  letter-spacing: 0.5px;
 }
 
-.ctrl-btn:hover {
+.controls button:hover {
   background: rgba(0, 212, 255, 0.2);
-  box-shadow: 0 0 12px var(--accent-glow);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
 }
 
-.ctrl-btn.active {
+.controls button.active {
   background: rgba(0, 212, 255, 0.3);
   border-color: var(--accent);
   color: #fff;
 }
 
-/* ========== 爆炸图滑块 ========== */
-.explode-slider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  background: var(--hud-bg);
-  border: 1px solid var(--border);
-  border-radius: 30px;
-  backdrop-filter: blur(10px);
-}
-
-.explode-slider input[type="range"] {
-  width: 120px;
-  height: 4px;
-  -webkit-appearance: none;
-  appearance: none;
-  background: rgba(0, 212, 255, 0.2);
-  border-radius: 2px;
-  outline: none;
-}
-
-.explode-slider input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: var(--accent);
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 8px var(--accent-glow);
-}
-
-.explode-slider span {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  min-width: 80px;
-}
-
-/* ========== 底部信息栏 ========== */
-.bottom-bar {
+/* ========== BOTTOM KEY HINTS ========== */
+.bottom-hints {
   position: fixed;
   bottom: 80px;
   left: 30px;
@@ -239,30 +172,24 @@ canvas {
   display: flex;
   gap: 12px;
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--text2);
 }
 
-.bottom-bar .key-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.bottom-bar kbd {
+.bottom-hints kbd {
   padding: 2px 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.1);
   border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 0.7rem;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
-/* ========== 加载动画 ========== */
-.loading-overlay {
+/* ========== LOADING ========== */
+.loading {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: var(--bg-primary);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -270,12 +197,12 @@ canvas {
   transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-.loading-overlay.fade-out {
+.loading.fade-out {
   opacity: 0;
   visibility: hidden;
 }
 
-.loading-spinner {
+.loading .spinner {
   width: 40px;
   height: 40px;
   border: 3px solid rgba(0, 212, 255, 0.2);
@@ -288,34 +215,13 @@ canvas {
   to { transform: rotate(360deg); }
 }
 
-.loading-text {
+.loading .text {
   margin-top: 12px;
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: var(--text2);
 }
 
-/* ========== 部件提示标签 ========== */
-.tooltip {
-  position: fixed;
-  z-index: 50;
-  padding: 6px 12px;
-  background: var(--hud-bg);
-  border: 1px solid var(--accent);
-  border-radius: 6px;
-  color: var(--text-primary);
-  font-size: 0.75rem;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s;
-  white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-.tooltip.visible {
-  opacity: 1;
-}
-
-/* ========== 响应式 ========== */
+/* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .side-panel {
     width: calc(100% - 40px);
@@ -325,41 +231,13 @@ canvas {
     bottom: 160px;
     max-height: 40vh;
   }
-  
-  .top-hud {
-    padding: 12px 16px;
-  }
-  
-  .hud-title h1 {
-    font-size: 1rem;
-  }
-  
-  .controls {
-    bottom: 10px;
-    padding: 8px 12px;
-    gap: 6px;
-  }
-  
-  .ctrl-btn {
-    padding: 6px 12px;
-    font-size: 0.7rem;
-  }
-  
-  .bottom-bar {
-    display: none;
-  }
+  .top-hud { padding: 12px 16px; }
+  .top-hud h1 { font-size: 1rem; }
+  .controls { bottom: 10px; padding: 8px 12px; gap: 6px; }
+  .controls button { padding: 6px 12px; font-size: 0.7rem; }
+  .bottom-hints { display: none; }
 }
 
-/* ========== 滚动条 ========== */
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 212, 255, 0.3);
-  border-radius: 2px;
-}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.3); border-radius: 2px; }

@@ -1,107 +1,620 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="达芬奇扑翼机 Three.js 三维交互展示 - 旋转缩放与爆炸图">
-  <title>达芬奇扑翼机 — Three.js 机械展示</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>达芬奇扑翼机 — 自研 3D 引擎</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--text:#e0e0e0;--text2:#a0a0b0;--accent:#00d4ff;--accent2:#00ffa3;--border:rgba(255,255,255,0.08)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh}
+#c{position:fixed;inset:0;z-index:1}
+.top{position:fixed;top:0;left:0;right:0;z-index:10;padding:20px 30px;background:linear-gradient(180deg,rgba(10,10,15,.95),transparent);display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.top h1{font-size:1.4rem;font-weight:600;letter-spacing:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.top p{font-size:.8rem;color:var(--text2);margin-top:4px}
+.side{position:fixed;top:80px;right:20px;bottom:100px;width:300px;z-index:10;background:rgba(10,15,25,.9);border:1px solid var(--border);border-radius:12px;padding:24px;overflow-y:auto;backdrop-filter:blur(10px)}
+.side h3{font-size:.75rem;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.side p{font-size:.85rem;line-height:1.6;color:var(--text2)}
+.parts{display:flex;flex-direction:column;gap:6px}
+.part-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:.8rem;color:var(--text2);cursor:pointer;transition:all .2s;border:1px solid transparent}
+.part-item:hover{background:rgba(0,212,255,.08);border-color:var(--accent);color:var(--text)}
+.part-color{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:10px;padding:12px 20px;background:rgba(10,15,25,.9);border:1px solid var(--border);border-radius:30px;backdrop-filter:blur(10px)}
+.controls button{padding:8px 18px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);border-radius:20px;color:var(--accent);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit}
+.controls button:hover{background:rgba(0,212,255,.2);box-shadow:0 0 12px rgba(0,212,255,.4)}
+.controls button.active{background:rgba(0,212,255,.3);border-color:var(--accent);color:#fff}
+.hints{position:fixed;bottom:80px;left:30px;z-index:10;display:flex;gap:12px;font-size:.75rem;color:var(--text2)}
+.hints kbd{padding:2px 6px;background:rgba(255,255,255,.1);border:1px solid var(--border);border-radius:4px;font-size:.7rem;color:var(--text)}
+.loading{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s}
+.loading.fade-out{opacity:0;visibility:hidden}
+.loading .sp{width:40px;height:40px;border:3px solid rgba(0,212,255,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading .tx{margin-top:12px;font-size:.85rem;color:var(--text2)}
+@media(max-width:768px){
+  .side{width:calc(100% - 40px);right:20px;left:20px;top:auto;bottom:160px;max-height:40vh}
+  .top{padding:12px 16px}.top h1{font-size:1rem}
+  .controls{bottom:10px;padding:8px 12px;gap:6px}.controls button{padding:6px 12px;font-size:.7rem}
+  .hints{display:none}
+}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,212,255,.3);border-radius:2px}
+</style>
 </head>
 <body>
+<canvas id="c"></canvas>
+<div class="top">
+  <div><h1>🛸 达芬奇扑翼机</h1><p>自研轻量 3D 引擎 · Canvas 2D</p></div>
+</div>
+<div class="side">
+  <h3>📐 历史背景</h3>
+  <p>列奥纳多·达·芬奇（1452-1519）在 1485 年左右设计了扑翼机（Ornithopter），这是人类最早的飞行器设计之一。</p>
+  <h3 style="margin-top:20px">⚙️ 部件说明</h3>
+  <div class="parts" id="parts"></div>
+  <h3 style="margin-top:20px">🔬 工作原理</h3>
+  <p>飞行员通过脚踏踏板驱动曲柄机构，带动四连杆系统使机翼上下扑动。机翼模仿鸟类翅膀，利用空气动力学产生推力与升力。</p>
+</div>
+<div class="hints">
+  <span><kbd>左键</kbd> 旋转</span>
+  <span><kbd>滚轮</kbd> 缩放</span>
+  <span><kbd>右键</kbd> 平移</span>
+  <span><kbd>点击</kbd> 高亮</span>
+</div>
+<div class="controls">
+  <button id="bExplode" onclick="toggleExplode()">💥 爆炸图</button>
+  <button id="bRotate" class="active" onclick="toggleRotate()">🔄 自动旋转</button>
+  <button id="bReset" onclick="resetView()">🎯 重置</button>
+  <button id="bWire" onclick="toggleWire()">🔲 线框</button>
+  <button onclick="location.href='../../index.html'">⬅ 主页</button>
+</div>
+<div class="loading" id="loading"><div class="sp"></div><span class="tx">正在初始化 3D 引擎...</span></div>
 
-  <!-- 加载覆盖层 -->
-  <div class="loading-overlay" id="loading">
-    <div class="loading-spinner"></div>
-    <span class="loading-text">正在加载三维模型...</span>
-  </div>
+<script>
+/* =================================================================
+   🛸 自研轻量 3D 引擎 — Canvas 2D 渲染
+   ================================================================= */
+(function(){
+'use strict';
 
-  <!-- 3D 画布容器 -->
-  <div id="canvas-container"></div>
+// ── 向量/矩阵工具 ──
+const V = {
+  add:(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],
+  sub:(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],
+  scale:(a,s)=>[a[0]*s,a[1]*s,a[2]*s],
+  dot:(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],
+  cross:(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],
+  len:a=>Math.sqrt(a[0]*a[0]+a[1]*a[1]+a[2]*a[2]),
+  norm:a=>{const l=V.len(a);return l>0?[a[0]/l,a[1]/l,a[2]/l]:[0,0,0];}
+};
 
-  <!-- 顶部 HUD -->
-  <div class="top-hud">
-    <div class="hud-title">
-      <h1>🛸 达芬奇扑翼机</h1>
-      <p>Three.js · 机械结构交互展示</p>
-    </div>
-    <div class="hud-stats">
-      <div>FPS: <span id="fps-counter">0</span></div>
-      <div>部件: <span id="part-count">8</span></div>
-    </div>
-  </div>
+function rotY(p,a){const c=Math.cos(a),s=Math.sin(a);return[p[0]*c+p[2]*s,p[1],-p[0]*s+p[2]*c];}
+function rotX(p,a){const c=Math.cos(a),s=Math.sin(a);return[p[0],p[1]*c-p[2]*s,p[1]*s+p[2]*c];}
+function rotZ(p,a){const c=Math.cos(a),s=Math.sin(a);return[p[0]*c-p[1]*s,p[0]*s+p[1]*c,p[2]];}
 
-  <!-- 右侧信息面板 -->
-  <div class="side-panel" id="sidePanel">
-    <div class="panel-section">
-      <h3>📐 历史背景</h3>
-      <p>
-        列奥纳多·达·芬奇（1452-1519）在 1485 年左右设计了扑翼机（Ornithopter），
-        这是人类最早的飞行器设计之一。其原理是通过模仿鸟类扑翼产生升力，
-        利用人力驱动机械结构实现飞行。
-      </p>
-    </div>
+// ── 全局状态 ──
+let canvas, ctx, W, H;
+let camera = { pos:[6,3,8], target:[0,0,0], fov:50, near:0.1, far:100 };
+let autoRotate = true, exploded = false, wireframe = false;
+let parts = [];
+let time = 0;
+let mouse = { x:0, y:0, down:false, button:0, lastX:0, lastY:0 };
+let hoveredPart = null;
+let azimuth = 0.6, elevation = 0.4, distance = 10;
 
-    <div class="panel-section">
-      <h3>⚙️ 部件说明</h3>
-      <div class="parts-list" id="partsList">
-        <!-- 由 JS 动态填充 -->
-      </div>
-    </div>
+// ── 部件定义 ──
+const PART_DEFS = [
+  { key:'fuselage',  name:'机身骨架', color:'#8B7355', explode:[0,0,0] },
+  { key:'cockpit',   name:'驾驶舱',   color:'#4A90D9', explode:[0,0.6,0.3] },
+  { key:'leftWing',  name:'左翼',     color:'#C4A35A', explode:[-3,0.2,0] },
+  { key:'rightWing', name:'右翼',     color:'#C4A35A', explode:[3,0.2,0] },
+  { key:'tailWing',  name:'尾翼',     color:'#B8946A', explode:[0,0.3,-2.5] },
+  { key:'landing',   name:'起落架',   color:'#666666', explode:[0,-1.2,0] },
+  { key:'mechanism', name:'扑翼机构', color:'#CC7733', explode:[0,-0.6,0.8] },
+  { key:'propeller', name:'尾桨',     color:'#AA6644', explode:[0,0.2,-2] },
+];
 
-    <div class="panel-section">
-      <h3>🔬 工作原理</h3>
-      <p>
-        飞行员通过脚踏踏板驱动曲柄机构，带动四连杆系统使机翼上下扑动。
-        机翼的弯曲形状模仿鸟类翅膀，利用空气动力学原理产生推力与升力。
-        尾翼用于控制方向，保持飞行稳定性。
-      </p>
-    </div>
-  </div>
+// ── 3D 图元（面） ──
+function makeFace(verts, color, partKey){
+  return { verts:verts, color:color, partKey:partKey, highlight:false };
+}
 
-  <!-- 底部信息栏 -->
-  <div class="bottom-bar">
-    <div class="key-hint">
-      <kbd>鼠标左键</kbd> 旋转视角
-    </div>
-    <div class="key-hint">
-      <kbd>滚轮</kbd> 缩放
-    </div>
-    <div class="key-hint">
-      <kbd>鼠标右键</kbd> 平移
-    </div>
-    <div class="key-hint">
-      <kbd>点击部件</kbd> 高亮显示
-    </div>
-  </div>
+// ── 生成长方体 ──
+function box(w,h,d,ox,oy,oz){
+  const x=w/2, y=h/2, z=d/2;
+  const v = [
+    [-x+ox,-y+oy,z+oz],[x+ox,-y+oy,z+oz],[x+ox,y+oy,z+oz],[-x+ox,y+oy,z+oz],   // front
+    [-x+ox,-y+oy,-z+oz],[x+ox,-y+oy,-z+oz],[x+ox,y+oy,-z+oz],[-x+ox,y+oy,-z+oz], // back
+  ];
+  return [
+    makeFace([v[0],v[1],v[2],v[3]],null), // front
+    makeFace([v[5],v[4],v[7],v[6]],null), // back
+    makeFace([v[4],v[0],v[3],v[7]],null), // left
+    makeFace([v[1],v[5],v[6],v[2]],null), // right
+    makeFace([v[3],v[2],v[6],v[7]],null), // top
+    makeFace([v[4],v[5],v[1],v[0]],null), // bottom
+  ];
+}
 
-  <!-- 控制面板 -->
-  <div class="controls">
-    <button class="ctrl-btn" id="btn-explode" onclick="toggleExplode()">💥 爆炸图</button>
-    <button class="ctrl-btn" id="btn-rotate" onclick="toggleAutoRotate()">🔄 自动旋转</button>
-    <button class="ctrl-btn" id="btn-reset" onclick="resetCamera()">🎯 重置视角</button>
-    <button class="ctrl-btn" id="btn-wireframe" onclick="toggleWireframe()">🔲 线框模式</button>
-    <button class="ctrl-btn" id="btn-back" onclick="window.location.href='../../index.html'">⬅ 主页</button>
-  </div>
+// ── 生成圆柱体 ──
+function cylinder(r1,r2,h,ox,oy,oz,seg){
+  seg = seg || 12;
+  const faces = [];
+  for(let i=0;i<seg;i++){
+    const a1 = (i/seg)*Math.PI*2, a2 = ((i+1)/seg)*Math.PI*2;
+    const c1=Math.cos(a1), s1=Math.sin(a1), c2=Math.cos(a2), s2=Math.sin(a2);
+    const v = [
+      [r1*c1+ox, oy, r1*s1+oz],
+      [r2*c1+ox, -h+oy, r2*s1+oz],
+      [r2*c2+ox, -h+oy, r2*s2+oz],
+      [r1*c2+ox, oy, r1*s2+oz],
+    ];
+    faces.push(makeFace(v,null));
+  }
+  // top cap
+  const top = [];
+  for(let i=0;i<seg;i++){ const a=(i/seg)*Math.PI*2; top.push([r1*Math.cos(a)+ox, oy, r1*Math.sin(a)+oz]); }
+  faces.push(makeFace(top,null));
+  // bottom cap
+  const bot = [];
+  for(let i=0;i<seg;i++){ const a=(i/seg)*Math.PI*2; bot.push([r2*Math.cos(a)+ox, -h+oy, r2*Math.sin(a)+oz]); }
+  faces.push(makeFace(bot,null));
+  return faces;
+}
 
-  <!-- 部件提示标签 -->
-  <div class="tooltip" id="tooltip"></div>
-
-  <!-- Three.js r128 UMD — 本地优先，CDN 兜底 -->
-  <script src="three.min.js"></script>
-  <script>
-    if (typeof THREE === 'undefined') {
-      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\/script>');
+// ── 生成圆环 ──
+function torus(r,tube,ox,oy,oz,seg){
+  seg = seg || 16;
+  const faces = [];
+  for(let i=0;i<seg;i++){
+    const a1=(i/seg)*Math.PI*2, a2=((i+1)/seg)*Math.PI*2;
+    for(let j=0;j<4;j++){
+      const b1=(j/4)*Math.PI*2, b2=((j+1)/4)*Math.PI*2;
+      const pts = [
+        [(r+tube*Math.cos(b1))*Math.cos(a1)+ox, tube*Math.sin(b1)+oy, (r+tube*Math.cos(b1))*Math.sin(a1)+oz],
+        [(r+tube*Math.cos(b2))*Math.cos(a1)+ox, tube*Math.sin(b2)+oy, (r+tube*Math.cos(b2))*Math.sin(a1)+oz],
+        [(r+tube*Math.cos(b2))*Math.cos(a2)+ox, tube*Math.sin(b2)+oy, (r*tube*Math.cos(b2))*Math.sin(a2)+oz],
+        [(r+tube*Math.cos(b1))*Math.cos(a2)+ox, tube*Math.sin(b1)+oy, (r+tube*Math.cos(b1))*Math.sin(a2)+oz],
+      ];
+      faces.push(makeFace(pts,null));
     }
-  </script>
-  <!-- OrbitControls（全局挂载） -->
-  <script src="Orbitcontrols.min.js"></script>
-  <script>
-    if (typeof OrbitControls === 'undefined' && typeof THREE !== 'undefined') {
-      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
-    }
-  </script>
+  }
+  return faces;
+}
 
-  <!-- 核心逻辑 -->
-  <script src="script.js"></script>
+// ── 生成球冠（半球） ──
+function hemisphere(r,ox,oy,oz,seg,stacks){
+  seg=seg||12; stacks=stacks||6;
+  const faces=[];
+  for(let i=0;i<stacks;i++){
+    const phi1=(i/stacks)*(Math.PI/2), phi2=((i+1)/stacks)*(Math.PI/2);
+    for(let j=0;j<seg;j++){
+      const t1=(j/seg)*Math.PI*2, t2=((j+1)/seg)*Math.PI*2;
+      const pts=[
+        [r*Math.sin(phi1)*Math.cos(t1)+ox, r*Math.cos(phi1)+oy, r*Math.sin(phi1)*Math.sin(t1)+oz],
+        [r*Math.sin(phi2)*Math.cos(t1)+ox, r*Math.cos(phi2)+oy, r*Math.sin(phi2)*Math.sin(t1)+oz],
+        [r*Math.sin(phi2)*Math.cos(t2)+ox, r*Math.cos(phi2)+oy, r*Math.sin(phi2)*Math.sin(t2)+oz],
+        [r*Math.sin(phi1)*Math.cos(t2)+ox, r*Math.cos(phi1)+oy, r*Math.sin(phi1)*Math.sin(t2)+oz],
+      ];
+      faces.push(makeFace(pts,null));
+    }
+  }
+  return faces;
+}
+
+// ── 生成机翼（薄板） ──
+function wing(span,root,tip,chord,thickness,ox,oy,oz){
+  const half=span/2;
+  const v=[
+    [ox,oy+chord*0.3,oz+root],[ox,oy+chord*0.1,oz+tip],
+    [ox,oy-chord*0.1,oz+tip-thickness],[ox,oy-chord*0.3,oz+root-thickness],
+    [ox+half,oy+chord*0.25,oz+root],[ox+half,oy+chord*0.05,oz+tip],
+    [ox+half,oy-chord*0.05,oz+tip-thickness],[ox+half,oy+chord*0.25,oz+root-thickness],
+  ];
+  return [
+    makeFace([v[0],v[1],v[5],v[4]],null),
+    makeFace([v[2],v[3],v[7],v[6]],null),
+    makeFace([v[0],v[3],v[2],v[1]],null),
+    makeFace([v[4],v[5],v[6],v[7]],null),
+    makeFace([v[0],v[4],v[7],v[3]],null),
+    makeFace([v[1],v[2],v[6],v[5]],null),
+  ];
+}
+
+// ── 构建扑翼机模型 ──
+function buildOrnithopter(){
+  PART_DEFS.forEach(def=>{
+    let faces = [];
+    switch(def.key){
+      case 'fuselage':
+        faces.push(...cylinder(0.15,0.1,3.5,0,0,0,8));
+        for(let i=-1.2;i<=1.2;i+=0.6){
+          faces.push(...torus(0.18,0.02,i,0,0,8,12));
+        }
+        for(let i=0;i<4;i++){
+          const a=(i/4)*Math.PI*2;
+          faces.push(...cylinder(0.015,0.015,3.2,Math.sin(a)*0.15,0,Math.cos(a)*0.15,6));
+        }
+        break;
+      case 'cockpit':
+        faces.push(...hemisphere(0.35,0,0.2,0,16,8));
+        faces.push(...cylinder(0.35,0.3,0.15,0,0.05,0,16));
+        break;
+      case 'leftWing':
+        faces.push(...wing(2.5,0,2.8,0.5,0.04,0,0,0));
+        faces.push(...cylinder(0.02,0.02,2.2,1.1,0,0.02,6));
+        for(let i=0.5;i<2.5;i+=0.5){
+          faces.push(...box(0.02,0.15,0.05,i,0,0.02));
+        }
+        break;
+      case 'rightWing':
+        faces.push(...wing(-2.5,0,-2.8,0.5,0.04,0,0,0));
+        faces.push(...cylinder(0.02,0.02,2.2,-1.1,0,0.02,6));
+        for(let i=-0.5;i>-2.5;i-=0.5){
+          faces.push(...box(0.02,0.15,0.05,i,0,0.02));
+        }
+        break;
+      case 'tailWing':
+        // vertical tail
+        faces.push(...box(0.03,0.8,0.5,0,0.4,-1.6));
+        // horizontal tail
+        faces.push(...box(0.8,0.02,0.3,0,0,-1.6));
+        break;
+      case 'landing':
+        [[0,1],[-0.5,-0.8],[0.5,-0.8]].forEach(p=>{
+          faces.push(...cylinder(0.02,0.02,0.5,p[0],-0.35,p[1],6));
+          faces.push(...cylinder(0.08,0.08,0.04,p[0],-0.6,p[1],12));
+        });
+        faces.push(...cylinder(0.015,0.015,1,0,-0.6,-0.8,6));
+        break;
+      case 'mechanism':
+        faces.push(...cylinder(0.08,0.08,0.3,0,-0.3,0,8));
+        for(let s=-1;s<=1;s+=2){
+          faces.push(...box(0.04,0.25,0.04,s*0.15,-0.2,0));
+          faces.push(...box(0.03,0.4,0.03,s*0.25,0,0));
+          // joint
+          const jfaces = cylinder(0.04,0.04,0.04,s*0.35,0.15,0,8);
+          faces.push(...jfaces);
+        }
+        break;
+      case 'propeller':
+        faces.push(...cylinder(0.05,0.05,0.08,0,0,-2,8));
+        for(let i=0;i<3;i++){
+          const a=(i/3)*Math.PI*2;
+          faces.push(...box(0.02,0.3,0.08,Math.cos(a)*0.15,Math.sin(a)*0.15,-2));
+        }
+        break;
+    }
+    // Assign color and partKey to all faces
+    faces.forEach(f=>{ f.color = def.color; f.partKey = def.key; });
+    parts.push({ def:def, faces:faces, offset:[0,0,0], originalOffset:[0,0,0] });
+  });
+}
+
+// ── 坐标变换 + 投影 ──
+function project(p){
+  // Transform to camera space
+  let v = [p[0]-camera.pos[0], p[1]-camera.pos[1], p[2]-camera.pos[2]];
+  // Look-at rotation
+  const fwd = V.norm(V.sub(camera.target, camera.pos));
+  const right = V.norm(V.cross(fwd, [0,1,0]));
+  const up = V.cross(right, fwd);
+  const camSpace = [V.dot(v,right), V.dot(v,up), V.dot(v,fwd)];
+  if(camSpace[2] <= camera.near) return null;
+  // Perspective
+  const f = 1/Math.tan(camera.fov*Math.PI/360);
+  const aspect = W/H;
+  const sx = (camSpace[0]*f/aspect)/camSpace[2];
+  const sy = (camSpace[1]*f)/camSpace[2];
+  return [(sx+1)*W/2, (1-sy)*H/2, camSpace[2]];
+}
+
+// ── 面着色 ──
+function shadeColor(color, lightDot, highlight){
+  // Parse hex
+  let r, g, b;
+  if(color.startsWith('rgb')){
+    const m = color.match(/\d+/g);
+    r=+m[0]; g=+m[1]; b=+m[2];
+  } else {
+    const hex = color.replace('#','');
+    r = parseInt(hex.substr(0,2),16);
+    g = parseInt(hex.substr(2,2),16);
+    b = parseInt(hex.substr(4,2),16);
+  }
+  // Apply lighting
+  const ambient = 0.3;
+  const intensity = ambient + (1-ambient)*Math.max(0,lightDot);
+  r = Math.min(255, r*intensity);
+  g = Math.min(255, g*intensity);
+  b = Math.min(255, b*intensity);
+  if(highlight){
+    r = Math.min(255, r+60);
+    g = Math.min(255, g+60);
+    b = Math.min(255, b+60);
+  }
+  return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+}
+
+// ── 渲染 ──
+function render(){
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0,0,W,H);
+
+  // Draw grid
+  drawGrid();
+
+  // Collect all faces with depth
+  const allFaces = [];
+  const lightDir = V.norm([0.5, 0.8, 0.3]);
+
+  parts.forEach(part=>{
+    const offset = part.offset;
+    part.faces.forEach(face=>{
+      // Transform vertices
+      const tv = face.verts.map(v=>[v[0]+offset[0], v[1]+offset[1], v[2]+offset[2]]);
+      // Compute face normal (in world space)
+      const e1 = V.sub(tv[1], tv[0]);
+      const e2 = V.sub(tv[2], tv[0]);
+      const normal = V.norm(V.cross(e1, e2));
+      // Back-face culling
+      const viewDir = V.sub(camera.pos, tv[0]);
+      if(!wireframe && V.dot(normal, viewDir) < 0) return;
+      // Project to screen
+      const projected = tv.map(v=>project(v));
+      if(projected.some(p=>!p)) return;
+      // Depth = average z
+      const avgZ = projected.reduce((s,p)=>s+p[2],0)/projected.length;
+      // Light
+      const lightDot = V.dot(normal, lightDir);
+      allFaces.push({ projected, color:face.color, partKey:face.partKey, z:avgZ, lightDot, highlight:face.highlight });
+    });
+  });
+
+  // Sort back-to-front
+  allFaces.sort((a,b)=>b.z-a.z);
+
+  // Draw
+  allFaces.forEach(f=>{
+    ctx.beginPath();
+    ctx.moveTo(f.projected[0][0], f.projected[0][1]);
+    for(let i=1;i<f.projected.length;i++){
+      ctx.lineTo(f.projected[i][0], f.projected[i][1]);
+    }
+    ctx.closePath();
+    if(wireframe){
+      ctx.strokeStyle = shadeColor(f.color, f.lightDot, f.highlight);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = shadeColor(f.color, f.lightDot, f.highlight);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+  });
+}
+
+// ── 网格地面 ──
+function drawGrid(){
+  const size = 15, step = 1;
+  const gridFaces = [];
+  for(let x=-size;x<=size;x+=step){
+    for(let z=-size;z<=size;z+=step){
+      const p1 = project([x, -2, z]);
+      const p2 = project([x+step, -2, z]);
+      const p3 = project([x+step, -2, z+step]);
+      const p4 = project([x, -2, z+step]);
+      if(p1&&p2&&p3&&p4){
+        ctx.beginPath();
+        ctx.moveTo(p1[0],p1[1]);
+        ctx.lineTo(p2[0],p2[1]);
+        ctx.lineTo(p3[0],p3[1]);
+        ctx.lineTo(p4[0],p4[1]);
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+// ── 相机更新 ──
+function updateCamera(){
+  const x = distance * Math.cos(elevation) * Math.sin(azimuth);
+  const y = distance * Math.sin(elevation);
+  const z = distance * Math.cos(elevation) * Math.cos(azimuth);
+  camera.pos = [camera.target[0]+x, camera.target[1]+y, camera.target[2]+z];
+}
+
+// ── 动画循环 ──
+function animate(){
+  requestAnimationFrame(animate);
+  time += 0.016;
+
+  if(autoRotate){
+    azimuth += 0.005;
+  }
+
+  // Flap wings
+  if(!exploded){
+    const flapAngle = Math.sin(time*2)*0.3;
+    const leftWing = parts.find(p=>p.def.key==='leftWing');
+    const rightWing = parts.find(p=>p.def.key==='rightWing');
+    if(leftWing) leftWing.offset = [0, flapAngle*0.5, flapAngle];
+    if(rightWing) rightWing.offset = [0, flapAngle*0.5, -flapAngle];
+  }
+
+  updateCamera();
+  render();
+}
+
+// ── 部件高亮 ──
+function highlightPart(key){
+  parts.forEach(p=>{
+    p.faces.forEach(f=>{
+      f.highlight = (f.partKey === key);
+    });
+  });
+}
+
+function clearHighlight(){
+  parts.forEach(p=>p.faces.forEach(f=>f.highlight=false));
+}
+
+// ── 爆炸图 ──
+function toggleExplode(){
+  exploded = !exploded;
+  document.getElementById('bExplode').classList.toggle('active', exploded);
+  const duration = 800;
+  const startTime = Date.now();
+  const startOffsets = parts.map(p=>p.offset.slice());
+  const targetOffsets = parts.map(p=>{
+    if(exploded){
+      return [p.def.explode[0], p.def.explode[1], p.def.explode[2]];
+    }
+    return [0,0,0];
+  });
+
+  function anim(){
+    const elapsed = Date.now() - startTime;
+    const t = Math.min(elapsed/duration, 1);
+    const eased = 1 - Math.pow(1-t, 3);
+    parts.forEach((p,i)=>{
+      p.offset = [
+        startOffsets[i][0] + (targetOffsets[i][0]-startOffsets[i][0])*eased,
+        startOffsets[i][1] + (targetOffsets[i][1]-startOffsets[i][1])*eased,
+        startOffsets[i][2] + (targetOffsets[i][2]-startOffsets[i][2])*eased,
+      ];
+    });
+    if(t<1) requestAnimationFrame(anim);
+  }
+  anim();
+}
+
+function toggleRotate(){
+  autoRotate = !autoRotate;
+  document.getElementById('bRotate').classList.toggle('active', autoRotate);
+}
+
+function resetView(){
+  azimuth = 0.6; elevation = 0.4; distance = 10;
+  updateCamera();
+}
+
+function toggleWire(){
+  wireframe = !wireframe;
+  document.getElementById('bWire').classList.toggle('active', wireframe);
+}
+
+// ── 鼠标交互 ──
+function onMouseMove(e){
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+  if(mouse.down){
+    const dx = e.clientX - mouse.lastX;
+    const dy = e.clientY - mouse.lastY;
+    if(mouse.button === 0){ // left = rotate
+      azimuth -= dx*0.01;
+      elevation = Math.max(-1.2, Math.min(1.2, elevation + dy*0.01));
+    } else if(mouse.button === 2){ // right = pan
+      const right = V.norm(V.norm(V.sub(camera.target, camera.pos)), [0,1,0]);
+      const up = [0,1,0];
+      camera.target = V.add(camera.target, V.scale(right, -dx*0.01*distance*0.01));
+      camera.target = V.add(camera.target, V.scale(up, dy*0.01*distance*0.01));
+    }
+    mouse.lastX = e.clientX;
+    mouse.lastY = e.clientY;
+    updateCamera();
+  }
+  // Raycast for hover
+  // Simple: check which part center is closest to mouse
+  // (simplified - just check screen-space distance to part center)
+  let closest = null, closestDist = 20;
+  parts.forEach(part=>{
+    const center = [part.offset[0], part.offset[1]+0.5, part.offset[2]];
+    const p = project(center);
+    if(p){
+      const dx = p[0]-mouse.x, dy = p[1]-mouse.y;
+      const d = Math.sqrt(dx*dx+dy*dy);
+      if(d < closestDist){
+        closestDist = d;
+        closest = part.def.key;
+      }
+    }
+  });
+  if(closest !== hoveredPart){
+    hoveredPart = closest;
+    highlightPart(closest);
+  }
+}
+
+function onMouseDown(e){
+  mouse.down = true;
+  mouse.button = e.button;
+  mouse.lastX = e.clientX;
+  mouse.lastY = e.clientY;
+  e.preventDefault();
+}
+
+function onMouseUp(){
+  mouse.down = false;
+}
+
+function onWheel(e){
+  distance = Math.max(3, Math.min(20, distance + e.deltaY*0.01));
+  updateCamera();
+  e.preventDefault();
+}
+
+function onContext(e){ e.preventDefault(); }
+
+// ── 初始化 ──
+function init(){
+  canvas = document.getElementById('c');
+  ctx = canvas.getContext('2d');
+  resize();
+  window.addEventListener('resize', resize);
+
+  buildOrnithopter();
+
+  // Populate parts list
+  const partsList = document.getElementById('parts');
+  PART_DEFS.forEach(def=>{
+    const item = document.createElement('div');
+    item.className = 'part-item';
+    item.innerHTML = `<div class="part-color" style="background:${def.color}"></div><span>${def.name}</span>`;
+    item.addEventListener('mouseenter', ()=>highlightPart(def.key));
+    item.addEventListener('mouseleave', ()=>clearHighlight());
+    partsList.appendChild(item);
+  });
+
+  // Events
+  canvas.addEventListener('mousemove', onMouseMove);
+  canvas.addEventListener('mousedown', onMouseDown);
+  canvas.addEventListener('mouseup', onMouseUp);
+  canvas.addEventListener('wheel', onWheel, {passive:false});
+  canvas.addEventListener('contextmenu', onContext);
+
+  // Hide loading
+  setTimeout(()=>{
+    document.getElementById('loading').classList.add('fade-out');
+  }, 300);
+
+  updateCamera();
+  animate();
+}
+
+function resize(){
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+}
+
+// ── 启动 ──
+init();
+
+})();
+</script>
 </body>
 </html>
