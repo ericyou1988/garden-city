@@ -86,12 +86,12 @@
   <!-- 部件提示标签 -->
   <div class="tooltip" id="tooltip"></div>
 
-  <!-- ES Module 导入映射 -->
+  <!-- ES Module 导入映射 — 本地 Three.js（解决公网 CDN 加载超时） -->
   <script type="importmap">
   {
     "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      "three": "./three.module.js",
+      "three/addons/": "./addons/"
     }
   }
   </script>

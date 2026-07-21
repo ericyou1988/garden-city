@@ -591,4 +591,21 @@ function animate() {
 }
 
 // ── 启动 ──
+window.addEventListener('error', (e) => {
+  const loading = document.getElementById('loading');
+  if (loading) {
+    loading.innerHTML = `<div style="color:#ff6b6b;font-size:1.2rem;margin-bottom:8px">⚠️ 加载出错</div>
+<p style="color:#aaa;font-size:0.85rem">${e.message || '请检查网络连接后刷新页面'}</p>`;
+  }
+});
+
+// 超时保底：5 秒后如果还在加载，显示提示
+setTimeout(() => {
+  const loading = document.getElementById('loading');
+  if (loading && !loading.classList.contains('fade-out')) {
+    loading.innerHTML = `<div style="color:#ffcc00;font-size:1.2rem;margin-bottom:8px">⏳ 加载较慢</div>
+<p style="color:#aaa;font-size:0.85rem">Three.js 文件较大（~1.3MB），请等待或刷新页面重试</p>`;
+  }
+}, 5000);
+
 init();
