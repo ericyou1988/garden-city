@@ -42,13 +42,14 @@ body {
   pointer-events: auto;
 }
 
-/* UI 隐藏时：容器透明，但显示按钮保持可见 */
+/* UI 隐藏时：完全禁用鼠标事件，不遮挡 3D 画布 */
 .float-ui.hidden {
   opacity: 0;
+  pointer-events: none;
 }
 
-.float-ui.hidden .ui-toggle {
-  opacity: 1 !important;
+.float-ui.hidden > * {
+  pointer-events: none !important;
 }
 
 /* ========== 顶部标题 ========== */
