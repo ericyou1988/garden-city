@@ -233,7 +233,7 @@ body {
   transform: scale(1.1);
 }
 
-/* ========== 加载动画 ========== */
+/* ========== 加载动画（安全兜底） ========== */
 .loading {
   position: fixed;
   inset: 0;
@@ -249,6 +249,7 @@ body {
 .loading.fade-out {
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
 }
 
 .loading .sp {
@@ -268,6 +269,9 @@ body {
   margin-top: 12px;
   font-size: 0.85rem;
   color: var(--text2);
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.4;
 }
 
 /* ========== 响应式 ========== */

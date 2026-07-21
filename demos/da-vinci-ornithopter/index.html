@@ -657,7 +657,35 @@ function toggleUI(){
 }
 
 // ── 启动 ──
-init();
+// 无论 init 成功与否，3 秒后强制隐藏 loading
+setTimeout(()=>{
+  const l = document.getElementById('loading');
+  if(l && !l.classList.contains('fade-out')){
+    l.classList.add('fade-out');
+  }
+}, 3000);
+
+try {
+  init();
+  // 5 秒后自动隐藏 UI，让用户先看 3D
+  setTimeout(()=>{
+    const fu = document.getElementById('floatUi');
+    const btn = document.getElementById('bToggle');
+    if(fu && !fu.classList.contains('hidden')){
+      fu.classList.add('hidden');
+      btn.textContent = '👁️‍🗨️';
+      btn.title = '显示面板';
+    }
+  }, 5000);
+} catch(e){
+  console.error('Init error:', e);
+  const l = document.getElementById('loading');
+  if(l){
+    l.innerHTML = '<div style="color:#ff6b6b;font-size:1.1rem;margin-bottom:8px">⚠️ 初始化失败</div>' +
+      '<p style="color:#aaa;font-size:0.8rem">' + (e.message || '未知错误') + '</p>' +
+      '<button onclick="location.reload()" style="margin-top:12px;padding:6px 16px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.3);border-radius:20px;color:var(--accent);cursor:pointer;font-size:.8rem">刷新重试</button>';
+  }
+}
 
 })();
 </script>
