@@ -67,6 +67,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 <div class="loading" id="loading"><div class="sp"></div><span class="tx">正在初始化 3D 引擎...</span></div>
 
+<!-- 漂浮面板（可收起） -->
+<div class="float-ui" id="floatUi">
+<div class="top">
+  <div><h1>🛸 达芬奇扑翼机</h1><p>自研轻量 3D 引擎 · Canvas 2D</p></div>
+</div>
+<div class="side">
+  <h3>📐 历史背景</h3>
+  <p>列奥纳多·达·芬奇（1452-1519）在 1485 年左右设计了扑翼机（Ornithopter），这是人类最早的飞行器设计之一。</p>
+  <h3 style="margin-top:20px">⚙️ 部件说明</h3>
+  <div class="parts" id="parts"></div>
+  <h3 style="margin-top:20px">🔬 工作原理</h3>
+  <p>飞行员通过脚踏踏板驱动曲柄机构，带动四连杆系统使机翼上下扑动。机翼模仿鸟类翅膀，利用空气动力学产生推力与升力。</p>
+</div>
+<div class="controls">
+  <button id="bExplode" onclick="toggleExplode()">💥 爆炸图</button>
+  <button id="bRotate" class="active" onclick="toggleRotate()">🔄 自动旋转</button>
+  <button id="bReset" onclick="resetView()">🎯 重置</button>
+  <button id="bWire" onclick="toggleWire()">🔲 线框</button>
+  <button onclick="location.href='../../index.html'">⬅ 主页</button>
+</div>
+<div class="hints">
+  <span><kbd>左键</kbd> 旋转</span>
+  <span><kbd>滚轮</kbd> 缩放</span>
+  <span><kbd>右键</kbd> 平移</span>
+  <span><kbd>点击</kbd> 高亮</span>
+</div>
+</div>
+
+<!-- 隐藏/显示 UI -->
+<button class="ui-toggle" id="bToggle" onclick="toggleUI()" title="隐藏/显示 面板">👁️</button>
+
 <script>
 /* =================================================================
    🛸 自研轻量 3D 引擎 — Canvas 2D 渲染
@@ -609,6 +640,20 @@ function resize(){
   H = window.innerHeight;
   canvas.width = W;
   canvas.height = H;
+}
+
+// ── UI 隐藏/显示 ──
+function toggleUI(){
+  const fu = document.getElementById('floatUi');
+  const btn = document.getElementById('bToggle');
+  fu.classList.toggle('hidden');
+  if(fu.classList.contains('hidden')){
+    btn.textContent = '👁️‍🗨️';
+    btn.title = '显示面板';
+  } else {
+    btn.textContent = '👁️';
+    btn.title = '隐藏面板';
+  }
 }
 
 // ── 启动 ──

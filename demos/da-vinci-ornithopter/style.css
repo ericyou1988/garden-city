@@ -1,8 +1,11 @@
+/* =================================================================
+   🛸 达芬奇扑翼机 — 自研 3D 引擎样式
+   ================================================================= */
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
   --bg: #0a0a0f;
-  --card: rgba(20, 20, 30, 0.85);
   --text: #e0e0e0;
   --text2: #a0a0b0;
   --accent: #00d4ff;
@@ -18,32 +21,52 @@ body {
   height: 100vh;
 }
 
-#canvas-container {
+/* ========== 3D 画布 ========== */
+#c {
   position: fixed;
   inset: 0;
   z-index: 1;
-}
-
-canvas {
   display: block;
 }
 
-/* ========== TOP HUD ========== */
-.top-hud {
+/* ========== 浮动 UI 容器 ========== */
+.float-ui {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.float-ui > * {
+  pointer-events: auto;
+}
+
+/* UI 隐藏时：容器透明，但显示按钮保持可见 */
+.float-ui.hidden {
+  opacity: 0;
+}
+
+.float-ui.hidden .ui-toggle {
+  opacity: 1 !important;
+}
+
+/* ========== 顶部标题 ========== */
+.top {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 10;
   padding: 20px 30px;
-  background: linear-gradient(180deg, rgba(10,10,15,0.95) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(10,10,15,0.95), transparent);
   display: flex;
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
 }
 
-.top-hud h1 {
+.top h1 {
   font-size: 1.4rem;
   font-weight: 600;
   letter-spacing: 2px;
@@ -52,14 +75,14 @@ canvas {
   -webkit-text-fill-color: transparent;
 }
 
-.top-hud p {
+.top p {
   font-size: 0.8rem;
   color: var(--text2);
   margin-top: 4px;
 }
 
-/* ========== SIDE PANEL ========== */
-.side-panel {
+/* ========== 右侧面板 ========== */
+.side {
   position: fixed;
   top: 80px;
   right: 20px;
@@ -74,7 +97,7 @@ canvas {
   backdrop-filter: blur(10px);
 }
 
-.side-panel h3 {
+.side h3 {
   font-size: 0.75rem;
   color: var(--accent);
   text-transform: uppercase;
@@ -84,19 +107,19 @@ canvas {
   border-bottom: 1px solid var(--border);
 }
 
-.side-panel p {
+.side p {
   font-size: 0.85rem;
   line-height: 1.6;
   color: var(--text2);
 }
 
-.side-panel .parts {
+.parts {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.side-panel .part-item {
+.part-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -109,20 +132,20 @@ canvas {
   border: 1px solid transparent;
 }
 
-.side-panel .part-item:hover {
+.part-item:hover {
   background: rgba(0, 212, 255, 0.08);
   border-color: var(--accent);
   color: var(--text);
 }
 
-.side-panel .part-color {
+.part-color {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-/* ========== CONTROLS ========== */
+/* ========== 控制按钮 ========== */
 .controls {
   position: fixed;
   bottom: 20px;
@@ -163,8 +186,8 @@ canvas {
   color: #fff;
 }
 
-/* ========== BOTTOM KEY HINTS ========== */
-.bottom-hints {
+/* ========== 快捷键提示 ========== */
+.hints {
   position: fixed;
   bottom: 80px;
   left: 30px;
@@ -175,7 +198,7 @@ canvas {
   color: var(--text2);
 }
 
-.bottom-hints kbd {
+.hints kbd {
   padding: 2px 6px;
   background: rgba(255,255,255,0.1);
   border: 1px solid var(--border);
@@ -184,7 +207,32 @@ canvas {
   color: var(--text);
 }
 
-/* ========== LOADING ========== */
+/* ========== UI 隐藏按钮 ========== */
+.ui-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 212, 255, 0.15);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: var(--accent);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ui-toggle:hover {
+  background: rgba(0, 212, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* ========== 加载动画 ========== */
 .loading {
   position: fixed;
   inset: 0;
@@ -202,7 +250,7 @@ canvas {
   visibility: hidden;
 }
 
-.loading .spinner {
+.loading .sp {
   width: 40px;
   height: 40px;
   border: 3px solid rgba(0, 212, 255, 0.2);
@@ -215,15 +263,15 @@ canvas {
   to { transform: rotate(360deg); }
 }
 
-.loading .text {
+.loading .tx {
   margin-top: 12px;
   font-size: 0.85rem;
   color: var(--text2);
 }
 
-/* ========== RESPONSIVE ========== */
+/* ========== 响应式 ========== */
 @media (max-width: 768px) {
-  .side-panel {
+  .side {
     width: calc(100% - 40px);
     right: 20px;
     left: 20px;
@@ -231,13 +279,34 @@ canvas {
     bottom: 160px;
     max-height: 40vh;
   }
-  .top-hud { padding: 12px 16px; }
-  .top-hud h1 { font-size: 1rem; }
-  .controls { bottom: 10px; padding: 8px 12px; gap: 6px; }
-  .controls button { padding: 6px 12px; font-size: 0.7rem; }
-  .bottom-hints { display: none; }
+  .top {
+    padding: 12px 16px;
+  }
+  .top h1 {
+    font-size: 1rem;
+  }
+  .controls {
+    bottom: 10px;
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .controls button {
+    padding: 6px 12px;
+    font-size: 0.7rem;
+  }
+  .hints {
+    display: none;
+  }
+  .ui-toggle {
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
 }
 
+/* ========== 滚动条 ========== */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.3); border-radius: 2px; }
