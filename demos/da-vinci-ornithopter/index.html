@@ -381,14 +381,21 @@ function init(){
   canvas.addEventListener('contextmenu',onContext);
   updateCamera();
   animate();
-  // 3秒后自动隐藏UI
-  setTimeout(()=>{const fu=document.getElementById('floatUi'),btn=document.getElementById('bToggle');if(fu&&!fu.classList.contains('hidden')){fu.classList.add('hidden');btn.textContent='👁️‍🗨️';btn.title='显示面板';}},3000);
+  // 隐藏 loading
+  const l=document.getElementById('loading');
+  if(l)l.classList.add('fade-out');
 }
 
 function resize(){W=window.innerWidth;H=window.innerHeight;canvas.width=W;canvas.height=H;}
 
 // ── 启动 ──
-try{init();}catch(e){console.error('Init failed:',e);}
+try{init();}catch(e){
+  console.error('Init failed:',e);
+  const l=document.getElementById('loading');
+  if(l){l.innerHTML='<div style="color:#ff6b6b">⚠️ 初始化失败: '+(e.message||'未知错误')+'</div><button onclick="location.reload()" style="margin-top:12px;padding:6px 16px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.3);border-radius:20px;color:#00d4ff;cursor:pointer">刷新重试</button>';}
+}
+// 保底：3秒后强制隐藏 loading
+setTimeout(()=>{const l=document.getElementById('loading');if(l)l.classList.add('fade-out');},3000);
 
 })();
 </script>
