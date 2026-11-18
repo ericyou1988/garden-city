@@ -463,7 +463,6 @@ try {
   scene.environment = makeEnvTexture();
 }
 
-
 /* ============================================================
    LIGHTS
    =============================
@@ -489,8 +488,6 @@ scene.add(sweepLight, sweepLight.target);
 const fillLight = new THREE.PointLight(0x00e5ff, 8, 12, 2);
 fillLight.position.set(-3, 1.2, -2.5);
 scene.add(fillLight);
-
-
 
 /* ============================================================
    STUDIO FLOOR (reflective)
@@ -749,8 +746,6 @@ wheelPositions.forEach(([x,y,z])=>{
 car.position.y = 0;
 scene.add(car);
 
-
-
 /* references for part highlighting */
 partRefs = {
   body: { mats:[bodyMat], label:'Sculpted Body', pos:new THREE.Vector3(0.2,0.5,1.1) },
@@ -797,7 +792,6 @@ for(let i=0;i<28;i++){
 h({ mesh:g, ang, rad, len, speed:0.6+Math.random()*0.8 });
 }
 scene.add(tunnel);
-
 
 /* ============================================================
    POST PROCESSING (bloom)
@@ -873,7 +867,6 @@ const st = ScrollTrigger.create({
   scrub: 0.6,
   onUpdate: self => { scrollProgress.v = self.progress; }
 });
-
 
 // reveal panels
 document.querySelectorAll('.reveal').forEach(el=>{
@@ -1155,8 +1148,6 @@ function animate(){
   }
 }
 animate();
-
-
 
 /* keyboard nav */
 addEventListener('keydown', e=>{
