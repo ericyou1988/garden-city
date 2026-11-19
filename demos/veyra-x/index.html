@@ -480,12 +480,12 @@ rimLight.position.set(-6, 3, -4);
 scene.add(rimLight);
 
 /* sweeping studio light */
-sweepLight = new THREE.SpotLight(0xbfd8ff, 42, 22, Math.PI/5, 0.6, 1.4);
+sweepLight = new THREE.SpotLight(0xbfd8ff, 100, 22, Math.PI/5, 0.6, 1.4);
 sweepLight.position.set(-4, 5, 3);
 sweepLight.target.position.set(0, 0.4, 0);
 scene.add(sweepLight, sweepLight.target);
 
-const fillLight = new THREE.PointLight(0x00e5ff, 8, 12, 2);
+const fillLight = new THREE.PointLight(0x00e5ff, 28, 12, 2);
 fillLight.position.set(-3, 1.2, -2.5);
 scene.add(fillLight);
 
@@ -536,8 +536,7 @@ canopyMat = new THREE.MeshPhysicalMaterial({
   clearcoat: 1.0, clearcoatRoughness: 0.05, emissive: 0x0a2030, emissiveIntensity: 0
 });
 lightBarMat = new THREE.MeshStandardMaterial({ color:0x000000, emissive:0x00e5ff, emissiveIntensity: 2.2, roughness:0.3 });
-underMat = new THREE.MeshStandardMaterial({ color:0x000000, emissive:0x00e5ff, emissiveIntensity: 2.0, roughness:0.5, si
-de:THREE.DoubleSide });
+underMat = new THREE.MeshStandardMaterial({ color:0x000000, emissive:0x00e5ff, emissiveIntensity: 2.0, roughness:0.5, side:THREE.DoubleSide });
 accentMat = new THREE.MeshStandardMaterial({ color:0x111111, emissive:0x00e5ff, emissiveIntensity: 1.6, roughness:0.4 });
 const darkMat = new THREE.MeshStandardMaterial({ color:0x0c0e12, metalness:0.6, roughness:0.5 });
 const carbonMat = new THREE.MeshStandardMaterial({ color:0x070809, metalness:0.4, roughness:0.6 });
@@ -801,6 +800,23 @@ composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.85, 0.5, 0.55);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
+// Robustness guard: if the bloom pass blackens the frame (unsupported float render targets,
+// e.g. SwiftShader/llvmpipe software GL, some VMs), disable it so the page never renders black.
+let bloomChecked = false;
+function checkBloom(){
+  if(bloomChecked) return; bloomChecked = true;
+  try{
+    const gl = renderer.getContext();
+    const bw = gl.drawingBufferWidth, bh = gl.drawingBufferHeight;
+    const sz = 64, x = Math.max(0, Math.floor((bw-sz)/2)), y = Math.max(0, Math.floor((bh-sz)/2));
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    const px = new Uint8Array(sz*sz*4);
+    gl.readPixels(x, y, sz, sz, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    let any = 0;
+    for(let i=0;i<px.length;i+=4){ const v = Math.max(px[i],px[i+1],px[i+2]); if(v>14){ any=1; break; } }
+    if(!any){ bloom.enabled = false; console.warn('VEYRA X: bloom disabled (unsupported renderer)'); }
+  }catch(e){ /* keep bloom on */ }
+}
 
 /* ============================================================
    CAMERA CHOREOGRAPHY (scroll-driven)
@@ -1139,6 +1155,7 @@ function animate(){
 
   if(firstFrame){
     firstFrame = false;
+    checkBloom(); // one-time: drop bloom if it blackened the frame
     setTimeout(()=>{
       const loader = document.getElementById('loader');
       loader.classList.add('hide');
