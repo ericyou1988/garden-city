@@ -484,3 +484,81 @@ body {
 .state-item, .event-item, .figure-item {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* ========== Garden City · Refined visual layer ========== */
+:root{
+  --bg-primary:#0c1017; --bg-secondary:#161d28; --bg-card:#141b26;
+  --border-color:#273347; --text-primary:#eef2f8; --text-secondary:#a8b6cc; --text-muted:#6b7a92;
+  --accent-primary:#d9a441; --accent-secondary:#5ec8d4;
+}
+body{
+  font-family:'Inter','Noto Sans SC',system-ui,sans-serif !important;
+  background:var(--bg-primary); -webkit-font-smoothing:antialiased;
+}
+/* depth: ambient glow */
+body::before{
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(1000px 500px at 15% 0%, rgba(217,164,65,.07), transparent 55%),
+    radial-gradient(900px 500px at 90% 20%, rgba(94,200,212,.05), transparent 55%);
+}
+.main-content,.edu-section,.header{ position:relative; z-index:1; }
+/* header: historical editorial feel */
+.header{
+  padding:56px 24px 38px !important;
+  background:linear-gradient(160deg,#1a2230 0%, #0c1017 100%) !important;
+}
+.header h1{
+  font-family:'Noto Serif SC',serif !important; font-weight:700 !important;
+  font-size:2.7rem !important; letter-spacing:5px !important;
+  background:linear-gradient(135deg,#e8c987,#d9a441 60%,#b8842f) !important;
+  -webkit-background-clip:text !important;
+}
+.subtitle{ font-family:'Noto Serif SC',serif; letter-spacing:1px; }
+/* glass cards */
+.map-section,.info-card,.edu-container{
+  background:linear-gradient(155deg,rgba(26,34,48,.9),rgba(17,23,33,.92)) !important;
+  border:1px solid var(--border-color) !important; border-radius:18px !important;
+  box-shadow:0 16px 44px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+.section-title h2{ font-family:'Noto Serif SC',serif; letter-spacing:1px; }
+.info-card h3{ font-family:'Noto Serif SC',serif; letter-spacing:1px; }
+/* map canvas backdrop */
+.map-container{
+  background:radial-gradient(ellipse at 50% 40%,#1b2740 0%,#0d1422 62%,#080d16 100%) !important;
+  border-radius:14px !important;
+}
+/* back button pill */
+.back-btn{
+  border-radius:999px !important; padding:9px 18px !important; letter-spacing:.5px;
+  background:rgba(217,164,65,.12) !important; border:1px solid rgba(217,164,65,.4) !important;
+  color:#e8c987 !important; backdrop-filter:blur(12px);
+}
+.back-btn:hover{ background:rgba(217,164,65,.22) !important; }
+/* timeline + periods */
+.timeline-control{ background:rgba(22,29,40,.85) !important; border:1px solid var(--border-color); }
+#timelineSlider::-webkit-slider-thumb{
+  background:linear-gradient(135deg,#e8c987,#d9a441) !important;
+  box-shadow:0 2px 12px rgba(217,164,65,.55) !important;
+}
+.period-btn{ border-radius:8px !important; }
+.period-btn.active{
+  background:linear-gradient(135deg,#e8c987,#d9a441) !important;
+  color:#1a1206 !important; border-color:#d9a441 !important;
+}
+/* list items */
+.state-item,.event-item,.figure-item{
+  background:rgba(255,255,255,.035) !important; border:1px solid rgba(255,255,255,.05);
+  border-radius:11px !important;
+}
+.state-item:hover,.event-item:hover{ border-color:rgba(217,164,65,.35) !important; }
+.state-color{ border-radius:50% !important; width:13px; height:13px; box-shadow:0 0 10px currentColor; }
+.event-item{ border-left:3px solid var(--accent-primary) !important; }
+.event-year{ color:#e8c987 !important; }
+.figure-name{ color:var(--accent-secondary) !important; }
+/* edu articles */
+.edu-container h2{ font-family:'Noto Serif SC',serif; letter-spacing:2px; }
+.edu-article{ background:rgba(255,255,255,.03) !important; border-radius:14px !important; }
+.edu-article h3{ font-family:'Noto Serif SC',serif; color:#e8c987 !important; }
+.power{ border-radius:10px !important; box-shadow:0 6px 18px rgba(0,0,0,.25); }
+

@@ -412,38 +412,42 @@ function drawStateTerritory(stateId, circles) {
   circles.forEach(circle => {
     const x = (circle.x / 100) * mapWidth;
     const y = (circle.y / 100) * mapHeight;
-    const r = (circle.r / 100) * Math.min(mapWidth, mapHeight) * 0.6;
+    const r = (circle.r / 100) * Math.min(mapWidth, mapHeight) * 0.42;
     
-    // 外发光
-    const glowGradient = ctx.createRadialGradient(x, y, r * 0.5, x, y, r * 1.5);
-    glowGradient.addColorStop(0, color + '40');
+    // 外发光（更柔和）
+    const glowGradient = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 1.7);
+    glowGradient.addColorStop(0, color + '32');
     glowGradient.addColorStop(1, 'transparent');
     ctx.fillStyle = glowGradient;
     ctx.beginPath();
-    ctx.arc(x, y, r * 1.5, 0, Math.PI * 2);
+    ctx.arc(x, y, r * 1.7, 0, Math.PI * 2);
     ctx.fill();
     
-    // 主体
-    const gradient = ctx.createRadialGradient(x, y, r * 0.3, x, y, r);
-    gradient.addColorStop(0, color + 'CC');
-    gradient.addColorStop(1, color + '80');
+    // 主体（半透明，重叠区可辨）
+    const gradient = ctx.createRadialGradient(x, y, r * 0.25, x, y, r);
+    gradient.addColorStop(0, color + 'B0');
+    gradient.addColorStop(1, color + '55');
     ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill();
     
     // 边框
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = color + 'DD';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.stroke();
     
-    // 国家名称
-    ctx.fillStyle = '#FFF';
-    ctx.font = `bold ${Math.max(14, r * 0.6)}px sans-serif`;
+    // 国家名称（加描边，保证 readability）
+    const fontSize = Math.max(12, Math.min(20, r * 0.7));
+    ctx.font = `600 ${fontSize}px 'Noto Sans SC', sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(8,13,22,0.85)';
+    ctx.strokeText(name, x, y);
+    ctx.fillStyle = '#FFF';
     ctx.fillText(name, x, y);
   });
 }
