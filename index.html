@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,9 +26,14 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
+  <!-- 字体（对齐 Doory：Nunito 正文 / Fraunces 标题 / Caveat 手写） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <!-- PWA 清单文件 -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#34d399">
+  <meta name="theme-color" content="#7c3aed">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -48,334 +53,457 @@
   </script>
 
   <style>
-    /* CSS 变量 - 暗色主题（默认） */
-    :root,
-    [data-theme="dark"] {
-      --bg-primary: #0f172a;
-      --bg-secondary: #1e293b;
-      --bg-card: #1e293b;
-      --text-primary: #e2e8f0;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --border-color: #334155;
-      --accent-primary: #34d399;
-      --accent-secondary: #06b6d4;
-      --header-gradient-start: #1e293b;
-      --header-gradient-end: #0f172a;
-      --card-title: #f1f5f9;
-      --card-shadow: rgba(0,0,0,0.3);
-      --tag-bg: #334155;
-      --clear-btn-bg: #334155;
-      --clear-btn-hover: #475569;
-      --footer-color: #475569;
-      --theme-toggle-bg: #334155;
-      --theme-toggle-hover: #475569;
+    /* ========== Garden City — 设计系统（对齐 Doory Templates 风格） ========== */
+    :root {
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --dur-fast: 0.2s;
+      --dur-slow: 0.4s;
+      --maxw: 1216px;
+      /* 字体系统（对齐 Doory） */
+      --font-sans: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+      --font-hand: "Caveat", "Segoe Print", "Bradley Hand", cursive;
     }
 
-    /* CSS 变量 - 亮色主题 */
+    /* 亮色主题（默认，对齐 Doory 的淡紫白 + 深棕文字） */
+    :root,
     [data-theme="light"] {
-      --bg-primary: #f8fafc;
+      --bg-primary: #fbfaff;
       --bg-secondary: #ffffff;
       --bg-card: #ffffff;
-      --text-primary: #1e293b;
-      --text-secondary: #64748b;
-      --text-muted: #94a3b8;
-      --border-color: #e2e8f0;
-      --accent-primary: #10b981;
-      --accent-secondary: #0891b2;
-      --header-gradient-start: #f1f5f9;
-      --header-gradient-end: #e2e8f0;
-      --card-title: #0f172a;
-      --card-shadow: rgba(0,0,0,0.1);
-      --tag-bg: #f1f5f9;
-      --clear-btn-bg: #e2e8f0;
-      --clear-btn-hover: #cbd5e1;
-      --footer-color: #94a3b8;
-      --theme-toggle-bg: #e2e8f0;
-      --theme-toggle-hover: #cbd5e1;
+      --bg-elevated: #ffffff;
+      --text-primary: #2b1c17;
+      --text-secondary: #6f6170;
+      --text-muted: #9a8f9e;
+      --border-color: #ece4f7;
+      --border-strong: #ddd2ee;
+      --accent: #7c3aed;
+      --accent-2: #db2777;
+      --accent-soft: rgba(124, 58, 237, 0.12);
+      --accent-grad: linear-gradient(135deg, #7c3aed, #db2777);
+      --highlight: #ffe8a8;
+      --header-bg: rgba(251, 250, 255, 0.82);
+      --card-shadow: 0 1px 2px rgba(43, 28, 23, 0.04), 0 4px 16px rgba(124, 58, 237, 0.08);
+      --card-shadow-hover: 0 8px 32px rgba(124, 58, 237, 0.18);
+      --tag-bg: #f3ecff;
+      --tag-text: #6b3fc4;
+      --clear-btn-bg: #f0e8fa;
+      --clear-btn-hover: #e4d6f5;
+      --footer-bg: #2b1c17;
+      --footer-text: #efe8f2;
+      --footer-muted: #a597ad;
+      --toggle-bg: #f0e8fa;
+      --toggle-hover: #e4d6f5;
+      --skeleton: #ece4f7;
+    }
+
+    /* 暗色主题 */
+    [data-theme="dark"] {
+      --bg-primary: #161226;
+      --bg-secondary: #1c1733;
+      --bg-card: #1f1a36;
+      --bg-elevated: #251e40;
+      --text-primary: #ede8f8;
+      --text-secondary: #a59cc7;
+      --text-muted: #6f6590;
+      --border-color: #2d2547;
+      --border-strong: #3d3360;
+      --accent: #a78bfa;
+      --accent-2: #f472b6;
+      --accent-soft: rgba(167, 139, 250, 0.18);
+      --accent-grad: linear-gradient(135deg, #a78bfa, #f472b6);
+      --highlight: #ffe8a8;
+      --header-bg: rgba(22, 18, 38, 0.82);
+      --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+      --card-shadow-hover: 0 8px 32px rgba(124, 58, 237, 0.4);
+      --tag-bg: #2d2547;
+      --tag-text: #c4b5fd;
+      --clear-btn-bg: #2d2547;
+      --clear-btn-hover: #3d3360;
+      --footer-bg: #0d0b1a;
+      --footer-text: #ede8f8;
+      --footer-muted: #6f6590;
+      --toggle-bg: #2d2547;
+      --toggle-hover: #3d3360;
+      --skeleton: #2d2547;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: var(--font-sans);
       background: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-    .header {
-      position: relative;
-      width: 100%;
-      padding: 48px 24px 32px;
-      text-align: center;
-      background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
-      transition: background 0.3s ease;
+
+    /* ========== 顶部导航（sticky + 毛玻璃，对齐 Doory header） ========== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      -webkit-backdrop-filter: saturate(1.4) blur(14px);
+      backdrop-filter: saturate(1.4) blur(14px);
+      border-bottom: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
-    .header h1 {
-      font-size: 2.5rem;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
+    .header-bar {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: var(--space-4) var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
     }
-    .header p { color: var(--text-secondary); font-size: 1.1rem; transition: color 0.3s ease; }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .logo .leaf { font-size: 1.4rem; }
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
 
     /* 主题切换按钮 */
     .theme-toggle {
-      position: absolute;
-      top: 20px;
-      right: 24px;
-      background: var(--theme-toggle-bg);
+      background: var(--toggle-bg);
       border: 1px solid var(--border-color);
       border-radius: 50%;
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
-      transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s;
-      z-index: 10;
+      font-size: 1.15rem;
+      transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s var(--ease-out);
     }
-    .theme-toggle:hover {
-      background: var(--theme-toggle-hover);
-      transform: scale(1.1);
-    }
-    .theme-toggle:active {
-      transform: scale(0.95);
-    }
+    .theme-toggle:hover { background: var(--toggle-hover); transform: scale(1.1); }
+    .theme-toggle:active { transform: scale(0.95); }
     .theme-toggle .icon-sun,
     .theme-toggle .icon-moon {
       transition: opacity 0.3s ease, transform 0.3s ease;
       position: absolute;
     }
-    .theme-toggle .icon-sun {
-      opacity: 0;
-      transform: rotate(-90deg) scale(0);
+    .theme-toggle .icon-sun { opacity: 0; transform: rotate(-90deg) scale(0); }
+    .theme-toggle .icon-moon { opacity: 1; transform: rotate(0deg) scale(1); }
+    [data-theme="light"] .theme-toggle .icon-sun { opacity: 1; transform: rotate(0deg) scale(1); }
+    [data-theme="light"] .theme-toggle .icon-moon { opacity: 0; transform: rotate(90deg) scale(0); }
+
+    /* ========== 主内容区：上下布局（对齐 Doory page） ========== */
+    main {
+      flex: 1;
+      width: 100%;
     }
-    .theme-toggle .icon-moon {
-      opacity: 1;
-      transform: rotate(0deg) scale(1);
-    }
-    [data-theme="light"] .theme-toggle .icon-sun {
-      opacity: 1;
-      transform: rotate(0deg) scale(1);
-    }
-    [data-theme="light"] .theme-toggle .icon-moon {
-      opacity: 0;
-      transform: rotate(90deg) scale(0);
+    .page {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: var(--space-12) var(--space-4) var(--space-10);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
     }
 
-    /* 搜索和筛选区域 */
-    .search-filter {
-      max-width: 960px;
+    /* 标题区：左对齐、自然宽度（对齐 Doory 的上方标题区） */
+    .hero {
+      align-self: flex-start;
+      max-width: 640px;
+      padding-top: var(--space-2);
+    }
+    /* eyebrow 高亮标签（手写体 + 黄色底部条，对齐 Doory） */
+    .eyebrow {
+      display: inline-block;
+      font-family: var(--font-hand);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      padding: 0 var(--space-2);
+      background: linear-gradient(
+        transparent 55%,
+        var(--highlight) 55%,
+        var(--highlight) 92%,
+        transparent 92%
+      );
+      line-height: 1.2;
+      margin-bottom: var(--space-4);
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: 3.4rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-4);
+    }
+    .hero h1 .grad {
+      background: var(--accent-grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero .lead {
+      font-size: 1.0625rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 32rem;
+    }
+
+    /* 内容区：标题下方，占满宽度 */
+    .content {
       width: 100%;
-      padding: 0 24px 16px;
+    }
+
+    /* 工具栏：搜索框 */
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
     }
     .search-box {
       position: relative;
-      margin-bottom: 16px;
     }
     .search-box input {
       width: 100%;
-      padding: 12px 16px 12px 44px;
-      background: var(--bg-card);
+      padding: 13px 16px 13px 44px;
+      background: var(--bg-elevated);
       border: 1px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: var(--radius-lg);
       color: var(--text-primary);
-      font-size: 1rem;
+      font-size: 0.95rem;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.3s ease, color 0.3s ease;
+      box-shadow: var(--card-shadow);
+      transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
     }
-    .search-box input::placeholder {
-      color: var(--text-muted);
-    }
+    .search-box input::placeholder { color: var(--text-muted); }
     .search-box input:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
     }
     .search-box .search-icon {
       position: absolute;
-      left: 14px;
+      left: 15px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       pointer-events: none;
     }
     .search-box .clear-btn {
       position: absolute;
-      right: 12px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
       background: var(--clear-btn-bg);
       border: none;
       color: var(--text-secondary);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       cursor: pointer;
       padding: 4px 8px;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       display: none;
       transition: background 0.2s;
     }
-    .search-box .clear-btn:hover {
-      background: var(--clear-btn-hover);
-    }
-    .search-box .clear-btn.visible {
-      display: block;
-    }
+    .search-box .clear-btn:hover { background: var(--clear-btn-hover); }
+    .search-box .clear-btn.visible { display: block; }
 
-    /* 标签筛选按钮 */
-    .filter-tags {
+    /* 筛选 chips（对齐 Doory chips） */
+    .chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: var(--space-2);
     }
-    .filter-tag {
-      padding: 6px 14px;
-      background: var(--bg-card);
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 7px 14px;
+      background: var(--bg-elevated);
       border: 1px solid var(--border-color);
       border-radius: 20px;
       color: var(--text-secondary);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all var(--dur-fast) var(--ease-out);
       user-select: none;
     }
-    .filter-tag:hover {
-      border-color: var(--accent-primary);
-      color: var(--accent-primary);
+    .chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
     }
-    .filter-tag.active {
-      background: var(--accent-primary);
-      border-color: var(--accent-primary);
-      color: #0f172a;
+    .chip.active {
+      background: var(--accent-grad);
+      border-color: transparent;
+      color: #fff;
       font-weight: 600;
+      box-shadow: 0 4px 12px var(--accent-soft);
+    }
+    .chip .count {
+      font-size: 0.7rem;
+      opacity: 0.7;
     }
 
-    .container {
-      max-width: 960px;
-      width: 100%;
-      padding: 16px 24px 32px;
-    }
+    /* ========== Demo 卡片网格 ========== */
     .demo-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: var(--space-6);
     }
     .demo-card {
       background: var(--bg-card);
-      border-radius: 12px;
-      padding: 24px;
-      transition: transform 0.2s, box-shadow 0.2s, background 0.3s ease, border-color 0.3s ease;
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow);
       text-decoration: none;
       color: inherit;
       display: block;
-      border: 1px solid var(--border-color);
+      transition: transform var(--dur-slow) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out), border-color 0.3s ease;
     }
     .demo-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 24px var(--card-shadow);
-      border-color: var(--accent-primary);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--accent);
     }
-    .demo-card .icon { font-size: 2rem; margin-bottom: 12px; }
-    .demo-card h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--card-title); transition: color 0.3s ease; }
-    .demo-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; transition: color 0.3s ease; }
+    .demo-card .icon {
+      font-size: 2rem;
+      margin-bottom: var(--space-3);
+      display: inline-block;
+      transition: transform var(--dur-slow) var(--ease-out);
+    }
+    .demo-card:hover .icon { transform: scale(1.12) rotate(-4deg); }
+    .demo-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      color: var(--text-primary);
+    }
+    .demo-card p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
     .demo-card .tag {
       display: inline-block;
-      margin-top: 12px;
+      margin-top: var(--space-3);
+      margin-right: var(--space-1);
       padding: 4px 10px;
       background: var(--tag-bg);
-      border-radius: 6px;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      transition: background 0.3s ease, color 0.3s ease;
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      color: var(--tag-text);
+      font-weight: 500;
     }
 
-    /* 访问统计样式 */
+    /* 访问统计 */
     .demo-stats {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border-color);
-      font-size: 0.75rem;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+      padding-top: var(--space-3);
+      border-top: 1px dashed color-mix(in srgb, var(--border-color) 70%, transparent);
+      font-size: 0.72rem;
       color: var(--text-muted);
-      transition: border-color 0.3s ease, color 0.3s ease;
-    }
-    .demo-stats .stats-visits {
-      white-space: nowrap;
-    }
-    .demo-stats .stats-date {
-      white-space: nowrap;
     }
 
-    /* 隐藏的卡片（筛选时用） */
-    .demo-card.hidden {
-      display: none;
-    }
+    .demo-card.hidden { display: none; }
 
     /* 无结果提示 */
     .no-results {
       text-align: center;
-      padding: 60px 24px;
+      padding: var(--space-12) var(--space-4);
       color: var(--text-muted);
       display: none;
-      transition: color 0.3s ease;
     }
-    .no-results.visible {
-      display: block;
-    }
-    .no-results .icon { font-size: 3rem; margin-bottom: 12px; }
+    .no-results.visible { display: block; }
+    .no-results .icon { font-size: 3rem; margin-bottom: var(--space-3); }
     .no-results p { font-size: 1rem; }
 
-    /* 屏幕阅读器专用 - 仅对辅助技术可见 */
+    /* 屏幕阅读器专用 */
     .sr-only {
       position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
       overflow: hidden;
       clip: rect(0, 0, 0, 0);
       white-space: nowrap;
       border: 0;
     }
 
-    .empty {
-      text-align: center;
-      padding: 80px 24px;
-      color: var(--text-muted);
-    }
-    .empty .icon { font-size: 4rem; margin-bottom: 16px; }
+    /* ========== 页脚（深色 + 顶部波浪曲线，对齐 Doory footer） ========== */
     .footer {
-      text-align: center;
-      padding: 32px 24px;
-      color: var(--footer-color);
-      font-size: 0.85rem;
-      transition: color 0.3s ease;
+      background: var(--footer-bg);
+      color: var(--footer-text);
+      padding: var(--space-10) var(--space-4) var(--space-8);
+      margin-top: var(--space-12);
+      position: relative;
+      overflow: hidden;
     }
-
-    /* 移动端响应式 */
-    @media (max-width: 600px) {
-      .header { padding: 32px 16px 24px; }
-      .header h1 { font-size: 1.8rem; }
-      .header p { font-size: 0.95rem; }
-      .search-filter { padding: 0 16px 12px; }
-      .search-box input { font-size: 0.9rem; padding: 10px 14px 10px 40px; }
-      .filter-tag { padding: 5px 12px; font-size: 0.8rem; }
-      .container { padding: 12px 16px 24px; }
-      .demo-grid { grid-template-columns: 1fr; }
-      .theme-toggle { top: 16px; right: 16px; width: 40px; height: 40px; font-size: 1.1rem; }
+    /* 顶部波浪曲线（fill 与页脚背景同色，形成曲线过渡） */
+    .footer-wave {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      display: block;
+      fill: var(--footer-bg);
+      pointer-events: none;
     }
+    .footer-inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      max-width: 22rem;
+    }
+    .footer-brand .logo { color: var(--footer-text); font-size: 1.3rem; font-family: var(--font-hand); font-weight: 700; }
+    .footer-brand p { color: var(--footer-muted); font-size: 0.85rem; }
+    .footer-legal {
+      font-size: 0.8rem;
+      color: var(--footer-muted);
+    }
+    .footer-legal a { color: var(--footer-text); text-decoration: underline; text-underline-offset: 3px; }
 
-    /* ========== Loading 动画 ========== */
-    /* 骨架屏 Loading 效果 — 页面加载时显示 */
+    /* ========== Loading 骨架屏 ========== */
     .loading-overlay {
       position: fixed;
       inset: 0;
@@ -387,84 +515,90 @@
       justify-content: center;
       transition: opacity 0.4s ease, visibility 0.4s ease;
     }
-    .loading-overlay.fade-out {
-      opacity: 0;
-      visibility: hidden;
-    }
-    /* 旋转加载图标 */
+    .loading-overlay.fade-out { opacity: 0; visibility: hidden; }
     .loading-spinner {
-      width: 48px;
-      height: 48px;
-      border: 4px solid var(--border-color);
-      border-top-color: var(--accent-primary);
+      width: 48px; height: 48px;
+      border: 4px solid var(--skeleton);
+      border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .loading-text {
-      margin-top: 16px;
+      margin-top: var(--space-4);
       font-size: 0.95rem;
       color: var(--text-secondary);
     }
-    /* 骨架屏卡片效果 — 模拟内容占位 */
     .skeleton-grid {
-      max-width: 960px;
+      max-width: var(--maxw);
       width: 100%;
-      padding: 16px 24px 32px;
+      padding: var(--space-12) var(--space-4);
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: var(--space-6);
     }
     .skeleton-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 24px;
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
       overflow: hidden;
       position: relative;
+      box-shadow: var(--card-shadow);
     }
     .skeleton-card::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--accent) 8%, transparent) 50%, transparent 100%);
       animation: shimmer 1.5s ease-in-out infinite;
     }
     @keyframes shimmer {
-      0%   { transform: translateX(-100%); }
+      0% { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
     }
     .skeleton-icon {
       width: 48px; height: 48px;
-      border-radius: 8px;
-      background: var(--border-color);
-      margin-bottom: 12px;
+      border-radius: var(--radius-md);
+      background: var(--skeleton);
+      margin-bottom: var(--space-3);
     }
     .skeleton-title {
-      width: 70%;
-      height: 18px;
-      border-radius: 4px;
-      background: var(--border-color);
-      margin-bottom: 10px;
+      width: 70%; height: 18px;
+      border-radius: var(--radius-sm);
+      background: var(--skeleton);
+      margin-bottom: var(--space-2);
     }
     .skeleton-desc {
-      width: 100%;
-      height: 12px;
-      border-radius: 4px;
-      background: var(--border-color);
-      margin-bottom: 6px;
+      width: 100%; height: 12px;
+      border-radius: var(--radius-sm);
+      background: var(--skeleton);
+      margin-bottom: var(--space-1);
     }
-    .skeleton-desc.short {
-      width: 60%;
-    }
+    .skeleton-desc.short { width: 60%; }
     .skeleton-tag {
-      width: 100px;
-      height: 20px;
-      border-radius: 6px;
-      background: var(--border-color);
-      margin-top: 12px;
+      width: 100px; height: 20px;
+      border-radius: var(--radius-sm);
+      background: var(--skeleton);
+      margin-top: var(--space-3);
+    }
+
+    /* ========== 移动端响应式 ========== */
+    @media (max-width: 960px) {
+      .page { flex-direction: column; gap: var(--space-8); }
+      .hero { width: 100%; }
+      .hero h1 { font-size: 2.6rem; }
+      .eyebrow { font-size: 1.3rem; }
+    }
+    @media (max-width: 600px) {
+      .header-bar { padding: var(--space-3) var(--space-4); gap: var(--space-3); }
+      .logo { font-size: 1.1rem; }
+      .page { padding: var(--space-8) var(--space-4); }
+      .hero h1 { font-size: 2rem; }
+      .hero .lead { font-size: 0.95rem; }
+      .demo-grid { grid-template-columns: 1fr; gap: var(--space-4); }
+      .demo-card { padding: var(--space-5); }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -473,7 +607,6 @@
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
     <span class="loading-text">加载中...</span>
-    <!-- 骨架屏卡片预览 -->
     <div class="skeleton-grid" style="margin-top: 32px;">
       <div class="skeleton-card">
         <div class="skeleton-icon"></div>
@@ -492,95 +625,130 @@
     </div>
   </div>
 
-  <div class="header">
-    <button class="theme-toggle" id="themeToggle" title="切换主题">
-      <span class="icon-sun">☀️</span>
-      <span class="icon-moon">🌙</span>
-    </button>
-    <h1>🌿 Garden City</h1>
-    <p>AI Agent 编程项目 Demo 展示中心</p>
-  </div>
-
-  <!-- 搜索框和标签筛选 -->
-  <div class="search-filter" role="search" aria-label="Demo 搜索和筛选">
-    <div class="search-box">
-      <span class="search-icon" aria-hidden="true">🔍</span>
-      <input type="text" id="searchInput" placeholder="搜索 Demo 名称、描述或技术栈..." autocomplete="off" aria-label="搜索 Demo" aria-describedby="searchHelp">
-      <span id="searchHelp" class="sr-only">输入关键词搜索 Demo 名称、描述或技术栈</span>
-      <button class="clear-btn" id="clearBtn" title="清空搜索" aria-label="清空搜索" aria-hidden="true">✕</button>
+  <!-- 顶部导航 -->
+  <header class="site-header">
+    <div class="header-bar">
+      <a href="./" class="logo"><span class="leaf">🌿</span> Garden City</a>
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" title="切换主题" aria-label="切换主题">
+          <span class="icon-sun">☀️</span>
+          <span class="icon-moon">🌙</span>
+        </button>
+      </div>
     </div>
-    <div class="filter-tags" id="filterTags" role="group" aria-label="Demo 分类筛选">
-      <button class="filter-tag active" data-tag="all" aria-pressed="true">全部</button>
-      <button class="filter-tag" data-tag="Three.js" aria-pressed="false">Three.js</button>
-      <button class="filter-tag" data-tag="WebGL" aria-pressed="false">WebGL</button>
-      <button class="filter-tag" data-tag="Canvas" aria-pressed="false">Canvas</button>
-      <button class="filter-tag" data-tag="天气" aria-pressed="false">天气</button>
-      <button class="filter-tag" data-tag="Claude Code" aria-pressed="false">Claude Code</button>
-      <button class="filter-tag" data-tag="Hermes" aria-pressed="false">Hermes</button>
-      <button class="filter-tag" data-tag="粒子系统" aria-pressed="false">粒子系统</button>
-      <button class="filter-tag" data-tag="机械" aria-pressed="false">机械</button>
-      <button class="filter-tag" data-tag="爆炸图" aria-pressed="false">爆炸图</button>
-    </div>
-  </div>
+  </header>
 
-  <main class="container" aria-label="Demo 列表">
-    <div class="demo-grid" id="demoGrid" role="list" aria-label="AI Agent Demo 展示列表">
-       <!-- 3D 地球轨道数据中心 -->
-       <a href="demos/3d-earth/" class="demo-card" data-demo-id="3d-earth" data-tags="Three.js,WebGL,粒子系统,Claude Code" role="listitem" aria-label="3D 地球轨道数据中心: 交互式 3D 可视化，使用 Three.js 和 WebGL 技术">
-        <div class="icon">🌍</div>
-        <h3>3D 地球轨道数据中心</h3>
-        <p>交互式 3D 可视化 — 人造卫星沿晨昏线轨道环绕地球，实时数据流连接地面站。包含大气散射着色器、昼夜交界辉光、悬停信息显示。</p>
-        <span class="tag">Three.js · WebGL · 粒子系统</span>
-        <span class="tag">Claude Code</span>
-      </a>
+  <main>
+    <div class="page">
+      <!-- 左侧：标题区 -->
+      <section class="hero" aria-label="站点介绍">
+        <p class="eyebrow">AI Agent Demo Hub</p>
+        <h1>探索 AI Agent<br><span class="grad">编程世界的花园</span></h1>
+        <p class="lead">所有 AI Agent 的编程项目 Demo 统一存放、统一展示。在这里，每个 Agent 的编程成果都种在花园里，随手即可逛遍全部作品。</p>
+      </section>
 
-      <!-- 天气应用 -->
-      <a href="demos/weather-app/" class="demo-card" data-demo-id="weather-app" data-tags="天气,Canvas,API,Hermes" role="listitem" aria-label="天气应用: 实时天气查询工具，使用 Open-Meteo API 和 Canvas 技术">
-        <div class="icon">🌤️</div>
-        <h3>天气应用</h3>
-        <p>实时天气查询工具，使用 Open-Meteo 免费 API，支持全球城市搜索。动态背景随天气变化，含24小时预报和7天预报，移动端完美适配。</p>
-        <span class="tag">天气 · API · Canvas</span>
-        <span class="tag">Hermes</span>
-      </a>
+      <!-- 右侧：内容区 -->
+      <section class="content" aria-label="Demo 列表">
+        <!-- 工具栏：搜索 + 筛选 -->
+        <div class="toolbar" role="search" aria-label="Demo 搜索和筛选">
+          <div class="search-box">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索 Demo 名称、描述或技术栈..." autocomplete="off" aria-label="搜索 Demo" aria-describedby="searchHelp">
+            <span id="searchHelp" class="sr-only">输入关键词搜索 Demo 名称、描述或技术栈</span>
+            <button class="clear-btn" id="clearBtn" title="清空搜索" aria-label="清空搜索" aria-hidden="true">✕</button>
+          </div>
+          <div class="chips" id="filterTags" role="group" aria-label="Demo 分类筛选">
+            <button class="chip active" data-tag="all" aria-pressed="true">全部</button>
+            <button class="chip" data-tag="Three.js" aria-pressed="false">Three.js</button>
+            <button class="chip" data-tag="WebGL" aria-pressed="false">WebGL</button>
+            <button class="chip" data-tag="Canvas" aria-pressed="false">Canvas</button>
+            <button class="chip" data-tag="天气" aria-pressed="false">天气</button>
+            <button class="chip" data-tag="Claude Code" aria-pressed="false">Claude Code</button>
+            <button class="chip" data-tag="Hermes" aria-pressed="false">Hermes</button>
+            <button class="chip" data-tag="粒子系统" aria-pressed="false">粒子系统</button>
+            <button class="chip" data-tag="机械" aria-pressed="false">机械</button>
+            <button class="chip" data-tag="爆炸图" aria-pressed="false">爆炸图</button>
+          </div>
+        </div>
 
-      <!-- 春秋战国历史地图 -->
-      <a href="demos/warring-states/" class="demo-card" data-demo-id="warring-states" data-tags="历史,Canvas,科普,Claude Code" role="listitem" aria-label="春秋战国历史地图: 交互式历史地图，展示诸侯国疆域变迁">
-        <div class="icon">🏛️</div>
-        <h3>春秋战国历史地图</h3>
-        <p>科普宣传风格的历史地图展示，从烽火戏诸侯到秦始皇统一。交互式时间轴控制，展示各国疆域变迁和关键历史事件。</p>
-        <span class="tag">历史 · Canvas · 科普</span>
-        <span class="tag">Claude Code</span>
-      </a>
+        <!-- Demo 卡片网格 -->
+        <div class="demo-grid" id="demoGrid" role="list" aria-label="AI Agent Demo 展示列表">
+          <!-- 3D 地球轨道数据中心 -->
+          <a href="demos/3d-earth/" class="demo-card" data-demo-id="3d-earth" data-tags="Three.js,WebGL,粒子系统,Claude Code" role="listitem" aria-label="3D 地球轨道数据中心: 交互式 3D 可视化，使用 Three.js 和 WebGL 技术">
+            <div class="icon">🌍</div>
+            <h3>3D 地球轨道数据中心</h3>
+            <p>交互式 3D 可视化 — 人造卫星沿晨昏线轨道环绕地球，实时数据流连接地面站。包含大气散射着色器、昼夜交界辉光、悬停信息显示。</p>
+            <span class="tag">Three.js · WebGL · 粒子系统</span>
+            <span class="tag">Claude Code</span>
+            <div class="demo-stats"><span class="stats-visits">👁 0</span><span class="stats-date">3D 可视化</span></div>
+          </a>
 
-      <!-- 达芬奇扑翼机 -->
-      <a href="demos/da-vinci-ornithopter/" class="demo-card" data-demo-id="da-vinci-ornithopter" data-tags="Three.js,WebGL,机械,爆炸图,Hermes" role="listitem" aria-label="达芬奇扑翼机: 三维机械结构展示，旋转缩放与爆炸图">
-        <div class="icon">🛸</div>
-        <h3>达芬奇扑翼机</h3>
-        <p>Three.js 三维机械结构展示 — 程序化构建 8 个机械部件，支持旋转缩放、爆炸图分离聚合、线框模式、部件高亮显示。</p>
-        <span class="tag">Three.js · WebGL · 机械结构</span>
-        <span class="tag">Hermes</span>
-      </a>
+          <!-- 天气应用 -->
+          <a href="demos/weather-app/" class="demo-card" data-demo-id="weather-app" data-tags="天气,Canvas,API,Hermes" role="listitem" aria-label="天气应用: 实时天气查询工具，使用 Open-Meteo API 和 Canvas 技术">
+            <div class="icon">🌤️</div>
+            <h3>天气应用</h3>
+            <p>实时天气查询工具，使用 Open-Meteo 免费 API，支持全球城市搜索。动态背景随天气变化，含 24 小时预报和 7 天预报，移动端完美适配。</p>
+            <span class="tag">天气 · API · Canvas</span>
+            <span class="tag">Hermes</span>
+            <div class="demo-stats"><span class="stats-visits">👁 0</span><span class="stats-date">天气工具</span></div>
+          </a>
 
-      <!-- Veyra X 电动超跑发布网站 -->
-      <a href="demos/veyra-x/" class="demo-card" data-demo-id="veyra-x" data-tags="Three.js,WebGL,粒子系统,Hermes" role="listitem" aria-label="Veyra X: 电动超跑发布网站，Three.js 程序化概念车 + 滚动编排 + 实时配置器">
-        <div class="icon">🏎️</div>
-        <h3>Veyra X 电动超跑</h3>
-        <p>虚构电动超跑发布网站 — 暗房扫光中的程序化概念车，滚动完成 360° 环绕与霓虹隧道冲刺，液态玻璃 UI、性能计数动画与实时漆面/轮毂配置器。</p>
-        <span class="tag">Three.js · WebGL · 发布网站</span>
-        <span class="tag">Hermes</span>
-      </a>
-    </div>
+          <!-- 春秋战国历史地图 -->
+          <a href="demos/warring-states/" class="demo-card" data-demo-id="warring-states" data-tags="历史,Canvas,科普,Claude Code" role="listitem" aria-label="春秋战国历史地图: 交互式历史地图，展示诸侯国疆域变迁">
+            <div class="icon">🏛️</div>
+            <h3>春秋战国历史地图</h3>
+            <p>科普宣传风格的历史地图展示，从烽火戏诸侯到秦始皇统一。交互式时间轴控制，展示各国疆域变迁和关键历史事件。</p>
+            <span class="tag">历史 · Canvas · 科普</span>
+            <span class="tag">Claude Code</span>
+            <div class="demo-stats"><span class="stats-visits">👁 0</span><span class="stats-date">历史科普</span></div>
+          </a>
 
-    <!-- 无搜索结果提示 -->
-    <div class="no-results" id="noResults" role="status" aria-live="polite" aria-atomic="true">
-      <div class="icon">🔍</div>
-      <p>没有找到匹配的 Demo</p>
+          <!-- 达芬奇扑翼机 -->
+          <a href="demos/da-vinci-ornithopter/" class="demo-card" data-demo-id="da-vinci-ornithopter" data-tags="Three.js,WebGL,机械,爆炸图,Hermes" role="listitem" aria-label="达芬奇扑翼机: 三维机械结构展示，旋转缩放与爆炸图">
+            <div class="icon">🛸</div>
+            <h3>达芬奇扑翼机</h3>
+            <p>Three.js 三维机械结构展示 — 程序化构建 8 个机械部件，支持旋转缩放、爆炸图分离聚合、线框模式、部件高亮显示。</p>
+            <span class="tag">Three.js · WebGL · 机械结构</span>
+            <span class="tag">Hermes</span>
+            <div class="demo-stats"><span class="stats-visits">👁 0</span><span class="stats-date">三维机械</span></div>
+          </a>
+
+          <!-- Veyra X 电动超跑发布网站 -->
+          <a href="demos/veyra-x/" class="demo-card" data-demo-id="veyra-x" data-tags="Three.js,WebGL,粒子系统,Hermes" role="listitem" aria-label="Veyra X: 电动超跑发布网站，Three.js 程序化概念车 + 滚动编排 + 实时配置器">
+            <div class="icon">🏎️</div>
+            <h3>Veyra X 电动超跑</h3>
+            <p>虚构电动超跑发布网站 — 暗房扫光中的程序化概念车，滚动完成 360° 环绕与霓虹隧道冲刺，液态玻璃 UI、性能计数动画与实时配置器。</p>
+            <span class="tag">Three.js · WebGL · 发布网站</span>
+            <span class="tag">Hermes</span>
+            <div class="demo-stats"><span class="stats-visits">👁 0</span><span class="stats-date">超跑发布</span></div>
+          </a>
+        </div>
+
+        <!-- 无搜索结果提示 -->
+        <div class="no-results" id="noResults" role="status" aria-live="polite" aria-atomic="true">
+          <div class="icon">🔍</div>
+          <p>没有找到匹配的 Demo</p>
+        </div>
+      </section>
     </div>
   </main>
 
+  <!-- 页脚 -->
   <footer class="footer" role="contentinfo" aria-label="页脚">
-    Powered by OpenClaw · 一体化部署流程 · Netlify CDN
-  </div>
+    <!-- 顶部波浪曲线 -->
+    <svg class="footer-wave" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,20 C240,40 480,0 720,20 C960,40 1200,0 1440,20 L1440,40 L0,40 Z"></path>
+    </svg>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="./" class="logo"><span class="leaf">🌿</span> Garden City</a>
+        <p>AI Agent 编程项目 Demo 统一展示中心</p>
+      </div>
+      <div class="footer-legal">
+        Powered by OpenClaw · 一体化部署流程 · <a href="https://www.netlify.com" target="_blank" rel="noopener">Netlify CDN</a>
+      </div>
+    </div>
+  </footer>
 
   <!-- 访问统计脚本（defer 异步加载，不阻塞渲染） -->
   <script src="stats.js" defer></script>
@@ -593,10 +761,7 @@
       var overlay = document.getElementById('loadingOverlay');
       if (overlay) {
         overlay.classList.add('fade-out');
-        // 动画结束后移除 DOM
-        setTimeout(function () {
-          overlay.remove();
-        }, 500);
+        setTimeout(function () { overlay.remove(); }, 500);
       }
     }
 
@@ -627,7 +792,6 @@
     if (typeof GardenStats !== 'undefined') {
       GardenStats.renderCards();
     } else {
-      // stats.js 使用 defer，可能还未加载完成
       window.addEventListener('load', function () {
         if (typeof GardenStats !== 'undefined') {
           GardenStats.renderCards();
@@ -643,41 +807,32 @@
       const themeToggle = document.getElementById('themeToggle');
       const STORAGE_KEY = 'garden-city-theme';
 
-      // 获取初始主题：优先 localStorage，其次系统偏好
       function getInitialTheme() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved === 'light' || saved === 'dark') return saved;
-        // 检测系统偏好
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
           return 'light';
         }
-        return 'dark';
+        return 'light';
       }
 
-      // 应用主题
       function applyTheme(theme) {
         html.setAttribute('data-theme', theme);
         localStorage.setItem(STORAGE_KEY, theme);
       }
 
-      // 初始化主题
       applyTheme(getInitialTheme());
 
-      // 切换按钮点击事件
       themeToggle.addEventListener('click', function () {
         const current = html.getAttribute('data-theme');
         const next = current === 'dark' ? 'light' : 'dark';
         applyTheme(next);
       });
 
-      // 监听系统主题变化（可选：如果用户未手动选择则跟随系统）
       if (window.matchMedia) {
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
           const saved = localStorage.getItem(STORAGE_KEY);
-          // 仅当用户未手动设置时才跟随系统
-          if (!saved) {
-            applyTheme(e.matches ? 'dark' : 'light');
-          }
+          if (!saved) { applyTheme(e.matches ? 'dark' : 'light'); }
         });
       }
     })();
@@ -690,11 +845,10 @@
       const demoGrid = document.getElementById('demoGrid');
       const noResults = document.getElementById('noResults');
       const cards = demoGrid.querySelectorAll('.demo-card');
-      const tagButtons = filterTags.querySelectorAll('.filter-tag');
+      const tagButtons = filterTags.querySelectorAll('.chip');
 
-      let activeTag = 'all'; // 当前激活的标签
+      let activeTag = 'all';
 
-      // 清空搜索框
       clearBtn.addEventListener('click', function () {
         searchInput.value = '';
         clearBtn.classList.remove('visible');
@@ -702,16 +856,13 @@
         searchInput.focus();
       });
 
-      // 搜索框输入事件 — 实时过滤
       searchInput.addEventListener('input', function () {
         clearBtn.classList.toggle('visible', searchInput.value.length > 0);
         filterCards();
       });
 
-      // 标签按钮点击事件
       tagButtons.forEach(function (btn) {
         btn.addEventListener('click', function () {
-          // 更新激活状态和 aria-pressed
           tagButtons.forEach(function (b) {
             b.classList.remove('active');
             b.setAttribute('aria-pressed', 'false');
@@ -723,7 +874,6 @@
         });
       });
 
-      // 核心过滤逻辑
       function filterCards() {
         const query = searchInput.value.trim().toLowerCase();
         let visibleCount = 0;
@@ -735,14 +885,12 @@
           const tagSpan = card.querySelector('.tag');
           const tagText = tagSpan ? tagSpan.textContent.toLowerCase() : '';
 
-          // 搜索匹配：标题、描述、标签
           const matchesSearch = !query
             || title.includes(query)
             || desc.includes(query)
             || tags.includes(query)
             || tagText.includes(query);
 
-          // 标签匹配
           const matchesTag = activeTag === 'all'
             || tags.split(',').some(function (t) { return t.trim() === activeTag.toLowerCase(); });
 
@@ -754,7 +902,6 @@
           }
         });
 
-        // 显示/隐藏无结果提示
         noResults.classList.toggle('visible', visibleCount === 0);
       }
     })();
